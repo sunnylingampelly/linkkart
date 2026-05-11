@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Stores API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .store-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>LinkKart Stores API Test</h1>
+    
+    <button onclick="fetchStores()">Fetch Stores</button>
+    
+    <div id="status"></div>
+    <div id="stores"></div>
+
+    <script>
+        async function fetchStores() {
+            const statusDiv = document.getElementById('status');
+            const storesDiv = document.getElementById('stores');
+            
+            statusDiv.innerHTML = '<p>Loading...</p>';
+            storesDiv.innerHTML = '';
+            
+            try {
+                const response = await fetch('http://localhost:8000/test-api.php');
+                const data = await response.json();
+                
+                console.log('API Response:', data);
+                
+                if (data.success && data.data) {
+                    statusDiv.innerHTML = `<p class="success">✅ Success! Found ${data.count} stores</p>`;
+                    
+                    data.data.forEach(store => {
+                        const card = document.createElement('div');
+                        card.className = 'store-card';
+                        card.innerHTML = `
+                            <h3>${store.name}</h3>
+                            <p><strong>Phone:</strong> ${store.phone}</p>
+                            <p><strong>Slug:</strong> ${store.slug}</p>
+                            <p><strong>Views:</strong> ${store.view_count}</p>
+                            <p><strong>Created:</strong> ${store.created_at}</p>
+                        `;
+                        storesDiv.appendChild(card);
+                    });
+                } else {
+                    statusDiv.innerHTML = '<p class="error">❌ No stores found</p>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                console.error('Error:', error);
+            }
+        }
+        
+        // Auto-fetch on load
+        window.onload = fetchStores;
+    </script>
+</body>
+</html>

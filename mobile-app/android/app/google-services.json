@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "945170638204",
+    "project_id": "linkkart-76fe1",
+    "storage_bucket": "linkkart-76fe1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945170638204:android:7ec3d914000b5fcf06f0f9",
+        "android_client_info": {
+          "package_name": "com.vashynova.linkkart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_P8ybrYEFm6yiw4EoOGRvjQiOBacOrEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,221 @@
+/* CheckoutDrawer.css - High-Class Light Gold Redesign */
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drawer-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer-content {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border-radius: 0;
+  padding: 32px 24px;
+  transform: translateY(100%);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: none;
+}
+
+@media (min-width: 768px) {
+  .drawer-content {
+    max-width: 480px;
+    margin: 0 auto;
+    border-radius: 0;
+    bottom: 0;
+    max-height: 85vh;
+  }
+}
+
+.drawer-content.open {
+  transform: translateY(0);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.drawer-handle {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 0;
+}
+
+.drawer-header h2 {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  margin: 0;
+  font-weight: 700;
+  color: #000;
+}
+
+.close-btn {
+  background: rgba(0, 0, 0, 0.02);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: rotate(90deg);
+}
+
+.order-summary-mini {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 0;
+  margin-bottom: 32px;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.mini-product-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mini-qty {
+  background: var(--secondary);
+  color: black;
+  padding: 4px 10px;
+  border-radius: 0;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.mini-name {
+  font-weight: 500;
+  font-size: 1rem;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #000;
+}
+
+.mini-total {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--secondary);
+}
+
+.drawer-error {
+  background: rgba(239, 68, 68, 0.05);
+  color: var(--error);
+  padding: 14px;
+  border-radius: 0;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  border: 1px solid rgba(239, 68, 68, 0.1);
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gray-500);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  font-size: 1rem;
+  font-family: var(--font-sans);
+  background: #fff;
+  color: #000;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+}
+
+.submit-order-btn {
+  width: 100%;
+  background: #25D366; /* WhatsApp Green */
+  color: #FFF;
+  border: none;
+  padding: 22px;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  margin-top: 16px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.submit-order-btn:hover:not(:disabled) {
+  background: #20bd5c;
+  transform: translateY(-4px);
+  box-shadow: 0 15px 40px rgba(37, 211, 102, 0.2);
+}
+
+.submit-order-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-order-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submit-order-btn.loading {
+  background: var(--gray-200);
+  color: var(--gray-500);
+}
+
