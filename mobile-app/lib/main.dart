@@ -12,6 +12,9 @@ import 'utils/constants.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  // Clean up any corrupted saved URL from previous versions
+  await AppConstants.cleanupSavedUrl();
+
   // Load saved API settings
   try {
     final prefs = await SharedPreferences.getInstance();
@@ -19,7 +22,8 @@ void main() async {
     final savedPort = prefs.getString('api_port');
     
     if (savedIp != null && savedPort != null) {
-      AppConstants.baseUrl = 'http://$savedIp:$savedPort/api/v1';
+      // baseUrl must be host:port ONLY — endpoint constants add /api/v1 themselves
+      AppConstants.baseUrl = 'http://$savedIp:$savedPort';
       debugPrint('Loaded saved API URL: ${AppConstants.baseUrl}');
     } else {
       debugPrint('Using default API URL: ${AppConstants.baseUrl}');

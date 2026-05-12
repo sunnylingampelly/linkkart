@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -101,8 +101,8 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
                 child: Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
               ),
@@ -135,8 +135,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                       padding: EdgeInsets.all(32),
                       decoration: BoxDecoration(
                         color: Colors.white, // Solid white for screenshot
-                        borderRadius: BorderRadius.circular(16),
-,
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.primary.withOpacity(0.15),
@@ -153,8 +152,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                             padding: EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               gradient: AppColors.primaryGradient,
-                              borderRadius: BorderRadius.circular(16),
-,
+                              borderRadius: BorderRadius.all(Radius.circular(16)),
                             ),
                             child: Icon(
                               Icons.store_rounded,
@@ -193,8 +191,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                             padding: EdgeInsets.all(20),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-,
+                              borderRadius: BorderRadius.all(Radius.circular(16)),
                               border: Border.all(
                                 color: AppColors.primary.withOpacity(0.2),
                                 width: 2,
@@ -223,8 +220,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
                               color: AppColors.background,
-                              borderRadius: BorderRadius.circular(16),
-,
+                              borderRadius: BorderRadius.all(Radius.circular(16)),
                             ),
                             child: Text(
                               storeUrl,
@@ -282,8 +278,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                           ),
                           backgroundColor: AppColors.success,
                           behavior: SnackBarBehavior.floating,
-                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
                           margin: EdgeInsets.all(16),
                         ),
                       );
@@ -308,8 +303,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: AppColors.info.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
-,
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
                       border: Border.all(
                         color: AppColors.info.withOpacity(0.3),
                       ),
@@ -356,14 +350,12 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-,
+      borderRadius: BorderRadius.all(Radius.circular(16)),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           boxShadow: [
             BoxShadow(
               color: gradient.colors.first.withOpacity(0.3),

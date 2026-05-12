@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -79,7 +79,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
                 child: Icon(Icons.camera_alt_rounded, color: AppColors.primary),
               ),
@@ -94,7 +94,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: AppColors.secondary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
                 child: Icon(Icons.photo_library_rounded, color: AppColors.secondary),
               ),
@@ -154,7 +154,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             ),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)),),
             duration: Duration(seconds: 2),
           ),
         );
@@ -209,7 +209,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   height: 200,
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
                     border: Border.all(
                       color: AppColors.primary.withOpacity(0.3),
                       width: 2,
@@ -218,7 +218,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   ),
                   child: _imageFile != null
                       ? ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.all(Radius.circular(14)),
                           child: Image.file(
                             _imageFile!,
                             fit: BoxFit.cover,
@@ -264,7 +264,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   hintText: 'e.g., Blue Denim Jeans',
                   prefixIcon: Icon(Icons.shopping_bag_rounded),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
                 textCapitalization: TextCapitalization.words,
@@ -286,7 +286,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   hintText: 'e.g., 1299',
                   prefixIcon: Icon(Icons.currency_rupee_rounded),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -311,7 +311,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   hintText: 'e.g., Comfortable fit, premium quality',
                   prefixIcon: Icon(Icons.description_rounded),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
                 maxLines: 4,
@@ -327,7 +327,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   backgroundColor: AppColors.primary,
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                   elevation: 0,
                 ),

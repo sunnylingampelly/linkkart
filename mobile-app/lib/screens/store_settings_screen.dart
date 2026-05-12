@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -79,8 +79,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
           content: Text('Store updated successfully!'),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
         ));
         Navigator.pop(context, true);
       }
@@ -90,8 +89,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
           content: Text('Failed to save: ${e.toString().replaceAll('Exception: ', '')}'),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
         ));
       }
     } finally {
@@ -161,8 +159,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                           height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(16),
-,
+                            borderRadius: BorderRadius.all(Radius.circular(16)),
                             color: Colors.white,
                             border: Border.all(color: AppColors.secondary, width: 2),
                             boxShadow: [
@@ -190,8 +187,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             decoration: BoxDecoration(
                               color: AppColors.primary,
                               shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(16),
-,
+                            borderRadius: BorderRadius.all(Radius.circular(16)),
                               border: Border.all(color: Colors.white, width: 2),
                             ),
                             child: Icon(Icons.camera_alt_rounded, color: Colors.white, size: 16),
@@ -251,8 +247,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
                     border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
@@ -273,8 +268,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         decoration: BoxDecoration(
                           color: AppColors.background,
-                          borderRadius: BorderRadius.circular(16),
-,
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
                           border: Border.all(color: AppColors.border),
                         ),
                         child: Row(
@@ -299,8 +293,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                                   content: Text('Link copied!'),
                                   duration: Duration(seconds: 1),
                                   behavior: SnackBarBehavior.floating,
-                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
                                 ));
                               },
                               child: Icon(Icons.copy_rounded, color: AppColors.primary, size: 18),
@@ -330,8 +323,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
                       elevation: 4,
                       shadowColor: Colors.black.withOpacity(0.3),
                     ),
@@ -401,18 +393,15 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             filled: true,
             fillColor: Colors.white,
             border: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(12)),
               borderSide: BorderSide(color: AppColors.border, width: 1),
             ),
             enabledBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(12)),
               borderSide: BorderSide(color: AppColors.border, width: 1),
             ),
             focusedBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(12)),
               borderSide: BorderSide(color: AppColors.primary, width: 1.5),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

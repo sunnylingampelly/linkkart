@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../utils/theme.dart';
 import 'create_store_screen.dart';
 
@@ -152,7 +152,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             color: _currentPage == index
                 ? AppTheme.primaryColor
                 : AppTheme.primaryColor.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.all(Radius.circular(4)),
           ),
         ),
       ),

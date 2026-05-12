@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 import '../utils/app_colors.dart';
 import '../providers/store_provider.dart';
 import '../services/api_service.dart';
@@ -20,11 +21,24 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Map<String, dynamic>? _stats;
   List<OrderModel> _orders = [];
   List<Product> _products = [];
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _load();
+    // Auto-refresh every 15 seconds for analytics updates
+    _refreshTimer = Timer.periodic(Duration(seconds: 15), (timer) {
+      if (mounted) {
+        _load();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -96,11 +110,25 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.refresh_rounded, color: AppColors.secondary),
-            onPressed: _load,
+          Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: Center(
+              child: Row(
+                children: [
+                  Icon(Icons.autorenew, size: 16, color: AppColors.success),
+                  SizedBox(width: 4),
+                  Text(
+                    'Auto',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(width: 8),
         ],
       ),
       body: _isLoading
@@ -157,8 +185,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(16),
-,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
             boxShadow: [
               BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 20, offset: Offset(0, 8)),
             ],
@@ -247,8 +274,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
-,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
             border: Border.all(color: AppColors.border),
           ),
           child: Row(
@@ -299,7 +325,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: Colors.black.withOpacity(0.05)),
       ),
       child: Column(
@@ -332,7 +358,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.all(color: AppColors.border),
         ),
         child: Center(
@@ -345,7 +371,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: Colors.black.withOpacity(0.05)),
       ),
       child: Column(
@@ -371,8 +397,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         SizedBox(width: 12),
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
             child: LinearProgressIndicator(
               value: ratio,
               minHeight: 10,
@@ -403,8 +428,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: Colors.black.withOpacity(0.05)),
       ),
       child: Row(
@@ -423,8 +447,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 ),
                 SizedBox(height: 6),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
                   child: LinearProgressIndicator(
                     value: ratio,
                     minHeight: 6,

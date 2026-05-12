@@ -122,8 +122,7 @@ class _CreateStoreScreenState extends State<CreateStoreScreen> {
           height: 40,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-,
+            borderRadius: BorderRadius.all(Radius.circular(8)),
             border: Border.all(color: AppColors.border),
           ),
           child: Padding(
@@ -176,8 +175,7 @@ class _CreateStoreScreenState extends State<CreateStoreScreen> {
                     height: 140,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-ular(16),
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
                       border: Border.all(
                         color: AppColors.border,
                         width: 1.5,
@@ -192,8 +190,7 @@ ular(16),
                     ),
                     child: _logoFile != null
                         ? ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-,
+                            borderRadius: BorderRadius.all(Radius.circular(16)),
                             child: Image.file(
                               _logoFile!,
                               fit: BoxFit.cover,
@@ -286,8 +283,7 @@ ular(16),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-Radius.circular(12))),
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
                     elevation: 4,
                     shadowColor: Colors.black.withOpacity(0.3),
                   ),
@@ -353,18 +349,15 @@ Radius.circular(12))),
             filled: true,
             fillColor: Colors.white,
             border: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-Radius.circular(12)),
+              borderRadius: BorderRadius.all(Radius.circular(12)),
               borderSide: BorderSide(color: AppColors.border, width: 1),
             ),
             enabledBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-Radius.circular(12)),
+              borderRadius: BorderRadius.all(Radius.circular(12)),
               borderSide: BorderSide(color: AppColors.border, width: 1),
             ),
             focusedBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-Radius.circular(12)),
+              borderRadius: BorderRadius.all(Radius.circular(12)),
               borderSide: BorderSide(color: AppColors.primary, width: 1.5),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

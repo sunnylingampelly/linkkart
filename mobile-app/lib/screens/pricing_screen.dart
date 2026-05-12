@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkkart/utils/app_colors.dart';
 import 'package:linkkart/services/api_service.dart';
@@ -206,8 +206,7 @@ class _PricingScreenState extends State<PricingScreen> {
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(
           color: isPopular ? AppColors.secondary : AppColors.border,
           width: isPopular ? 2 : 1,
@@ -334,8 +333,8 @@ class _PricingScreenState extends State<PricingScreen> {
                       foregroundColor: isFree ? AppColors.primary : Colors.white,
                       side: isFree ? const BorderSide(color: AppColors.primary, width: 2) : null,
                       shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-,
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
+
                       ),
                       elevation: 0,
                     ),

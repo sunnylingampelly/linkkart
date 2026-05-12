@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -153,14 +153,12 @@ class _HomeTabState extends State<HomeTab> {
                 MaterialPageRoute(builder: (_) => NotificationsScreen()),
               );
             },
-            borderRadius: BorderRadius.circular(16),
-,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
             child: Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-,
+                borderRadius: BorderRadius.all(Radius.circular(16)),
                 border: Border.all(color: AppColors.border),
               ),
               child: Stack(
@@ -203,8 +201,7 @@ class _HomeTabState extends State<HomeTab> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: AppColors.secondary.withOpacity(0.3), width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -233,8 +230,7 @@ class _HomeTabState extends State<HomeTab> {
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Color(0xFFD4AF37).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
                 ),
                 child: Row(
                   children: [
@@ -333,14 +329,12 @@ class _HomeTabState extends State<HomeTab> {
   Widget _buildActionPill({required IconData icon, required String label, required Color color, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-,
+      borderRadius: BorderRadius.all(Radius.circular(16)),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
@@ -398,8 +392,7 @@ class _HomeTabState extends State<HomeTab> {
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
@@ -470,8 +463,7 @@ class _HomeTabState extends State<HomeTab> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Color(0xFFF9F7F1), // Very light gold/warm white
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: Color(0xFFE5D5A4)), // Gold border
       ),
       child: Row(
@@ -481,8 +473,7 @@ class _HomeTabState extends State<HomeTab> {
             decoration: BoxDecoration(
               color: Color(0xFFD4AF37).withOpacity(0.2),
               shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
             ),
             child: const Icon(
               Icons.workspace_premium_rounded,
@@ -524,8 +515,7 @@ class _HomeTabState extends State<HomeTab> {
               },
               style: TextButton.styleFrom(
                 backgroundColor: Color(0xFFD4AF37),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
               ),
               child: Text(
                 'Upgrade',

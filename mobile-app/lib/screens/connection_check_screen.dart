@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../utils/app_colors.dart';
 import '../utils/constants.dart';
@@ -118,7 +118,7 @@ class _ConnectionCheckScreenState extends State<ConnectionCheckScreen> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.success.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                     border: Border.all(
                       color: AppColors.success.withOpacity(0.3),
                     ),
@@ -160,7 +160,7 @@ class _ConnectionCheckScreenState extends State<ConnectionCheckScreen> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.info.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                     border: Border.all(
                       color: AppColors.info.withOpacity(0.3),
                     ),
@@ -215,7 +215,7 @@ class _ConnectionCheckScreenState extends State<ConnectionCheckScreen> {
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
                       ),
                     ),
                     child: Text(

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../services/api_service.dart';
@@ -82,8 +82,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-,
+                borderRadius: BorderRadius.all(Radius.circular(16)),
                 border: Border.all(color: AppColors.primary, width: 2),
               ),
               child: Column(
@@ -95,8 +94,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(16),
-,
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
                         ),
                         child: const Icon(
                           Icons.workspace_premium,
@@ -171,8 +169,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-,
+                borderRadius: BorderRadius.all(Radius.circular(16)),
                 border: Border.all(color: AppColors.border),
               ),
               child: Column(
@@ -234,8 +231,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(16),
-,
+                borderRadius: BorderRadius.all(Radius.circular(16)),
               ),
               child: Row(
                 children: [
@@ -284,9 +280,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
                   ),
                   elevation: 0,
                 ),

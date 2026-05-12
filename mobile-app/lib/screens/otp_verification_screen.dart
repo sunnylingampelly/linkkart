@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -212,7 +212,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
                 backgroundColor: Colors.transparent,
                 pinTheme: PinTheme(
                   shape: PinCodeFieldShape.box,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
                   fieldHeight: 56,
                   fieldWidth: 48,
                   activeFillColor: Colors.transparent,

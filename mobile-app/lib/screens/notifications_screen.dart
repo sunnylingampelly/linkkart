@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 import '../utils/app_colors.dart';
 import '../providers/store_provider.dart';
 import '../services/api_service.dart';
@@ -20,11 +21,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   List<OrderModel> _recentOrders = [];
   bool _isLoading = true;
   String? _error;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _loadNotifications();
+    // Auto-refresh every 5 seconds for real-time notifications
+    _refreshTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (mounted) {
+        _loadNotifications();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadNotifications() async {
@@ -75,11 +89,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.refresh_rounded, color: AppColors.primary),
-            onPressed: _loadNotifications,
+          Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: Center(
+              child: Row(
+                children: [
+                  Icon(Icons.autorenew, size: 16, color: AppColors.success),
+                  SizedBox(width: 4),
+                  Text(
+                    'Auto',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(width: 8),
         ],
       ),
       body: _isLoading
@@ -108,21 +136,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+
       ),
       child: Row(
         children: [
-          Container(width: 44, height: 44, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(16),
+          Container(width: 44, height: 44, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.all(Radius.circular(16)),
 )),
           SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(height: 14, width: 160, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(4))),
+                Container(height: 14, width: 160, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.all(Radius.circular(4)),)),
                 SizedBox(height: 8),
-                Container(height: 12, width: 100, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(4))),
+                Container(height: 12, width: 100, decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.all(Radius.circular(4)),)),
               ],
             ),
           ),
@@ -190,8 +218,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 height: 100,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
                 child: Icon(Icons.notifications_none_rounded, size: 52, color: AppColors.primary),
               ),
@@ -227,7 +255,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         Container(
           width: 4,
           height: 18,
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.all(Radius.circular(2)),),
         ),
         SizedBox(width: 10),
         Column(
@@ -271,8 +299,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.all(
             color: isPending ? AppColors.warning.withOpacity(0.3) : AppColors.border,
             width: isPending ? 1.5 : 1,
@@ -294,8 +321,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               height: 44,
               decoration: BoxDecoration(
                 color: accentColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(16),
-,
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+
               ),
               child: Icon(icon, color: accentColor, size: 22),
             ),
@@ -325,8 +352,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           padding: EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                           decoration: BoxDecoration(
                             color: AppColors.warning.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(16),
-,
+                            borderRadius: BorderRadius.all(Radius.circular(16)),
+
                           ),
                           child: Text(
                             'NEW',

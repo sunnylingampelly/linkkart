@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../utils/app_colors.dart';
 import 'home_tab.dart';
@@ -116,8 +116,7 @@ class _MainScreenState extends State<MainScreen> {
           color: isActive
               ? item.activeColor.withOpacity(0.1)
               : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

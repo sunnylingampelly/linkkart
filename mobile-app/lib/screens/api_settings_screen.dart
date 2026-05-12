@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -170,8 +170,7 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.info.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
                   border: Border.all(
                     color: AppColors.info.withOpacity(0.3),
                   ),
@@ -214,18 +213,18 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
                   filled: true,
                   fillColor: AppColors.surface,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+
                     borderSide: BorderSide(color: AppColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+
                     borderSide: BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+
                     borderSide: BorderSide(color: AppColors.primary, width: 2),
                   ),
                 ),
@@ -252,18 +251,18 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
                   filled: true,
                   fillColor: AppColors.surface,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+
                     borderSide: BorderSide(color: AppColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+
                     borderSide: BorderSide(color: AppColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+
                     borderSide: BorderSide(color: AppColors.primary, width: 2),
                   ),
                 ),
@@ -279,8 +278,7 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
                     color: _connectionStatus!.startsWith('✅')
                         ? AppColors.success.withOpacity(0.1)
                         : AppColors.error.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
                     border: Border.all(
                       color: _connectionStatus!.startsWith('✅')
                           ? AppColors.success.withOpacity(0.3)
@@ -313,8 +311,7 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-,
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
                     ),
                   ),
                   child: _isTestingConnection
@@ -348,8 +345,7 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
                     foregroundColor: AppColors.primary,
                     side: BorderSide(color: AppColors.primary),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-,
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
                     ),
                   ),
                   child: Text(
@@ -369,8 +365,7 @@ class _ApiSettingsScreenState extends State<ApiSettingsScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Column(

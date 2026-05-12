@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -92,7 +92,7 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
             content: Text('Image ${index + 1} updated successfully!'),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)),),
             duration: Duration(seconds: 1),
           ),
         );
@@ -124,8 +124,8 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.border,
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
               ),
               SizedBox(height: 24),
@@ -180,14 +180,12 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-,
+      borderRadius: BorderRadius.all(Radius.circular(16)),
       child: Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.all(color: color.withOpacity(0.3)),
         ),
         child: Row(
@@ -196,8 +194,8 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: color,
-                borderRadius: BorderRadius.circular(16),
-,
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+
               ),
               child: Icon(icon, color: Colors.white, size: 24),
             ),
@@ -266,7 +264,7 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(24)),),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -301,7 +299,7 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.secondary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
                       padding: EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: Text('Great', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
@@ -321,7 +319,7 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
             content: Text('Failed to update product: ${e.toString()}'),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)),),
           ),
         );
       }
@@ -508,8 +506,7 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
                             foregroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-,
+                              borderRadius: BorderRadius.all(Radius.circular(16)),
                             ),
                             disabledBackgroundColor: AppColors.secondary.withOpacity(0.5),
                           ),
@@ -567,8 +564,7 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
       child: Container(
         decoration: BoxDecoration(
           color: hasImage ? Colors.transparent : AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.all(
             color: isPrimary ? AppColors.secondary : AppColors.border,
             width: isPrimary ? 2 : 1,
@@ -584,8 +580,7 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
               : null,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -645,8 +640,8 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.secondary,
-                      borderRadius: BorderRadius.circular(16),
-,
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+
                     ),
                     child: Text(
                       'PRIMARY',
@@ -708,8 +703,8 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.border,
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
               ),
               SizedBox(height: 24),
@@ -782,23 +777,23 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
             filled: true,
             fillColor: AppColors.surface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+
               borderSide: BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+
               borderSide: BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+
               borderSide: BorderSide(color: AppColors.secondary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+
               borderSide: BorderSide(color: AppColors.error),
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),

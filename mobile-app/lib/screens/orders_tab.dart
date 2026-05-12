@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:async';
 import '../utils/app_colors.dart';
 import '../models/order_model.dart';
 import '../services/api_service.dart';
@@ -21,11 +22,24 @@ class _OrdersTabState extends State<OrdersTab> {
   bool _isLoading = true;
   List<OrderModel> _orders = [];
   String _selectedStatus = 'all'; // all, pending, completed, cancelled
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _fetchOrders();
+    // Auto-refresh every 5 seconds for real-time order updates
+    _refreshTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (mounted) {
+        _fetchOrders();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _fetchOrders() async {
@@ -83,9 +97,25 @@ class _OrdersTabState extends State<OrdersTab> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: AppColors.primary),
-            onPressed: _fetchOrders,
+          // Auto-refresh indicator
+          Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: Center(
+              child: Row(
+                children: [
+                  Icon(Icons.autorenew, size: 16, color: AppColors.success),
+                  SizedBox(width: 4),
+                  Text(
+                    'Auto',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -147,8 +177,7 @@ class _OrdersTabState extends State<OrdersTab> {
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         side: BorderSide(
           color: isSelected ? AppColors.primary : AppColors.border,
         ),
@@ -163,8 +192,7 @@ class _OrdersTabState extends State<OrdersTab> {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.all(color: AppColors.border),
         ),
         child: Column(
@@ -200,8 +228,7 @@ class _OrdersTabState extends State<OrdersTab> {
       margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: Offset(0, 2))
@@ -223,8 +250,8 @@ class _OrdersTabState extends State<OrdersTab> {
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+
                   ),
                   child: Text(
                     order.status.toUpperCase(),
@@ -282,8 +309,7 @@ class _OrdersTabState extends State<OrdersTab> {
                   height: 50,
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
                     border: Border.all(color: AppColors.border),
                     image: order.productImage != null && order.productImage!.isNotEmpty
                         ? DecorationImage(
@@ -332,7 +358,7 @@ class _OrdersTabState extends State<OrdersTab> {
                         foregroundColor: AppColors.error,
                         side: BorderSide(color: AppColors.error),
                         padding: EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)),),
                       ),
                       child: Text('Cancel'),
                     ),
@@ -344,7 +370,7 @@ class _OrdersTabState extends State<OrdersTab> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.success,
                         padding: EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8)),),
                       ),
                       child: Text('Mark Complete', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                     ),

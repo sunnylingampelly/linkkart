@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:async';
 import '../utils/app_colors.dart';
 import '../models/customer_model.dart';
 import '../services/api_service.dart';
@@ -19,11 +20,24 @@ class _CustomersTabState extends State<CustomersTab> {
   final ApiService _apiService = ApiService();
   bool _isLoading = true;
   List<CustomerModel> _customers = [];
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _fetchCustomers();
+    // Auto-refresh every 10 seconds for customer updates
+    _refreshTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+      if (mounted) {
+        _fetchCustomers();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _fetchCustomers() async {
@@ -73,9 +87,25 @@ class _CustomersTabState extends State<CustomersTab> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: AppColors.primary),
-            onPressed: _fetchCustomers,
+          // Auto-refresh indicator
+          Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: Center(
+              child: Row(
+                children: [
+                  Icon(Icons.autorenew, size: 16, color: AppColors.success),
+                  SizedBox(width: 4),
+                  Text(
+                    'Auto',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -103,8 +133,7 @@ class _CustomersTabState extends State<CustomersTab> {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.all(color: AppColors.border),
         ),
         child: Column(
@@ -133,8 +162,7 @@ class _CustomersTabState extends State<CustomersTab> {
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: AppColors.border),
       ),
       child: Padding(
@@ -146,8 +174,8 @@ class _CustomersTabState extends State<CustomersTab> {
               height: 56,
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-,
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+
               ),
               child: Center(
                 child: Text(

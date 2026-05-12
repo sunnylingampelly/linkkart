@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -43,8 +43,7 @@ class ProfileTab extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.15),
@@ -60,8 +59,7 @@ class ProfileTab extends StatelessWidget {
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(16),
-,
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
                         border: Border.all(color: AppColors.secondary, width: 2),
                       ),
                       child: Container(
@@ -69,8 +67,8 @@ class ProfileTab extends StatelessWidget {
                         height: 100,
                         decoration: const BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-,
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+
                         ),
                         child: Icon(
                           Icons.store_rounded,
@@ -213,8 +211,7 @@ class ProfileTab extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: AppColors.border),
       ),
       child: Row(
@@ -248,8 +245,7 @@ class ProfileTab extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: Colors.black.withOpacity(0.05)),
         boxShadow: [
           BoxShadow(
@@ -265,8 +261,8 @@ class ProfileTab extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: color.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(16),
-,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+
           ),
           child: Icon(icon, color: color, size: 24),
         ),
@@ -306,8 +302,8 @@ class ProfileTab extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+
           ),
           title: Row(
             children: [
@@ -315,8 +311,8 @@ class ProfileTab extends StatelessWidget {
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: AppColors.error.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
                 child: Icon(Icons.logout_rounded, color: AppColors.error),
               ),
@@ -358,8 +354,8 @@ class ProfileTab extends StatelessWidget {
                 backgroundColor: AppColors.error,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
@@ -395,8 +391,8 @@ class ProfileTab extends StatelessWidget {
               padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-,
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -438,8 +434,7 @@ class ProfileTab extends StatelessWidget {
             content: Text('Logged out successfully'),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
           ),
         );
       });
@@ -455,8 +450,7 @@ class ProfileTab extends StatelessWidget {
           content: Text('Logout failed: ${e.toString()}'),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
         ),
       );
     }
@@ -468,8 +462,8 @@ class ProfileTab extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+
       ),
       builder: (context) {
         return SafeArea(
@@ -485,8 +479,8 @@ class ProfileTab extends StatelessWidget {
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.border,
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
               ),
               SizedBox(height: 24),
@@ -627,8 +621,8 @@ class ProfileTab extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+
       ),
       builder: (context) {
         return DraggableScrollableSheet(
@@ -649,8 +643,8 @@ class ProfileTab extends StatelessWidget {
                       height: 4,
                       decoration: BoxDecoration(
                         color: AppColors.border,
-                        borderRadius: BorderRadius.circular(16),
-,
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
+
                       ),
                     ),
                   ),
@@ -733,8 +727,7 @@ class ProfileTab extends StatelessWidget {
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -747,8 +740,8 @@ class ProfileTab extends StatelessWidget {
                 padding: EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
                 child: Icon(Icons.help_outline_rounded, color: AppColors.primary, size: 20),
               ),

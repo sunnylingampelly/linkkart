@@ -12,10 +12,10 @@ class AppTheme {
   static const double spacing32 = 32.0;
   static const double spacing48 = 48.0;
 
-  // Radius Constants (Sharp design)
-  static const double radiusSmall = 0.0;
-  static const double radiusMedium = 0.0;
-  static const double radiusLarge = 0.0;
+  // Radius Constants (Rounded design)
+  static const double radiusSmall = 8.0;
+  static const double radiusMedium = 12.0;
+  static const double radiusLarge = 16.0;
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -116,8 +116,7 @@ class AppTheme {
         elevation: 2,
         shadowColor: Color(0x1A000000),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
         color: AppColors.surface,
       ),
@@ -127,8 +126,7 @@ class AppTheme {
         backgroundColor: AppColors.surface,
         elevation: 24,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
         titleTextStyle: GoogleFonts.playfairDisplay(
           fontSize: 22,
@@ -146,23 +144,19 @@ class AppTheme {
         filled: true,
         fillColor: AppColors.surfaceLight,
         border: const OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           borderSide: BorderSide(color: Color(0x0D000000)),
         ),
         enabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           borderSide: BorderSide(color: Color(0x0D000000)),
         ),
         focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           borderSide: BorderSide(color: AppColors.secondary, width: 2),
         ),
         errorBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           borderSide: BorderSide(color: AppColors.error),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -180,8 +174,7 @@ class AppTheme {
           foregroundColor: AppColors.textWhite,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           textStyle: GoogleFonts.inter(
             fontSize: 16,

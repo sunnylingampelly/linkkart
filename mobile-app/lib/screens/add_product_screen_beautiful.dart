@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -82,7 +82,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
               height: 4,
               decoration: BoxDecoration(
                 color: AppColors.border,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.all(Radius.circular(2)),
               ),
             ),
             SizedBox(height: 24),
@@ -150,12 +150,12 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.all(Radius.circular(20)),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 24),
         decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.all(Radius.circular(20)),
           boxShadow: [
             BoxShadow(
               color: gradient.colors.first.withOpacity(0.3),
@@ -248,7 +248,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
         ),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
         margin: EdgeInsets.all(16),
       ),
     );
@@ -271,7 +271,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
         ),
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
         margin: EdgeInsets.all(16),
       ),
     );
@@ -295,7 +295,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
                 child: Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
               ),
@@ -445,7 +445,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
                   end: Alignment.bottomRight,
                 ),
           color: _imageFile != null ? AppColors.surface : null,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.all(Radius.circular(24)),
           border: Border.all(
             color: _imageFile != null 
                 ? AppColors.primary.withOpacity(0.3)
@@ -464,7 +464,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
             ? Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.all(Radius.circular(22)),
                     child: Image.file(
                       _imageFile!,
                       width: double.infinity,
@@ -478,7 +478,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
                       ),
                       child: IconButton(
                         icon: Icon(Icons.edit_rounded, color: Colors.white),
@@ -495,7 +495,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.primary.withOpacity(0.3),
@@ -578,26 +578,26 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
                 gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Icon(icon, color: Colors.white, size: 20),
             ),
             filled: true,
             fillColor: AppColors.surface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.all(Radius.circular(16)),
               borderSide: BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.all(Radius.circular(16)),
               borderSide: BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.all(Radius.circular(16)),
               borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.all(Radius.circular(16)),
               borderSide: BorderSide(color: AppColors.error),
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -612,7 +612,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
       height: 60,
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.all(Radius.circular(16)),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withOpacity(0.4),
@@ -627,7 +627,7 @@ class _AddProductScreenBeautifulState extends State<AddProductScreenBeautiful> w
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
         ),
         child: _isLoading

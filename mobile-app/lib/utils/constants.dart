@@ -7,6 +7,7 @@ class AppConstants {
   // Multiple endpoints for fallback (tries in order)
   
   static const List<String> baseUrls = [
+    'http://192.168.1.22:8000',   // Current PC IP (primary)
     'http://192.168.1.8:8000',
     'http://192.168.1.25:8000',
     'http://192.168.1.38:8000',
@@ -19,9 +20,26 @@ class AppConstants {
     'http://localhost:8000',
   ];
   
-  static String baseUrl = baseUrls[0];
+  static String _baseUrl = 'http://192.168.1.22:8000';
+  static String get baseUrl => _baseUrl;
+  static set baseUrl(String url) {
+    // Strip any accidental /api/v1 path that may have been stored
+    _baseUrl = url.replaceAll(RegExp(r'/api/v1.*$'), '');
+  }
+
+  /// Call on app startup to wipe any previously corrupted saved URL
+  static Future<void> cleanupSavedUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedHost = prefs.getString('api_ip') ?? '';
+    // If saved host contains a path (e.g. was saved as full URL), clear it
+    if (savedHost.contains('/') || savedHost.contains('api')) {
+      await prefs.remove('api_ip');
+      await prefs.remove('api_port');
+      debugPrint('🧹 Cleared corrupted saved API host: $savedHost');
+    }
+  }
   
-  static const String storefrontUrl = 'http://192.168.1.8:3002';
+  static const String storefrontUrl = 'http://192.168.1.22:3002';
   
   /// Attempts to find a reachable API URL from the available options
   static Future<void> discoverBaseUrl() async {
@@ -34,7 +52,9 @@ class AppConstants {
       final savedPort = prefs.getString('api_port');
       
       if (savedHost != null && savedPort != null) {
-        final savedUrl = 'http://$savedHost:$savedPort';
+        // Guard: only use saved host if it's a raw IP/hostname, not a full URL
+        final cleanHost = savedHost.replaceAll(RegExp(r'http://|https://|/.*'), '');
+        final savedUrl = 'http://$cleanHost:$savedPort';
         try {
           debugPrint('Probing SAVED API at: $savedUrl/api/health');
           final response = await client.get(
@@ -74,6 +94,7 @@ class AppConstants {
         baseUrl = workingUrl;
         debugPrint('✅ API Discovery: Found reachable backend at $baseUrl');
         
+        // Save only host and port — never the full path
         final uri = Uri.parse(workingUrl);
         await prefs.setString('api_ip', uri.host);
         await prefs.setString('api_port', uri.port.toString());

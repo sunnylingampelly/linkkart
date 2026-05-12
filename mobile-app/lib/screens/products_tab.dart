@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
@@ -172,8 +172,7 @@ class _ProductsTabState extends State<ProductsTab> {
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                     border: Border.all(color: AppColors.border),
                   ),
                   child: Row(
@@ -184,13 +183,11 @@ class _ProductsTabState extends State<ProductsTab> {
                         height: 70,
                         decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(16),
-,
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
                         child: product.image != null && product.image!.isNotEmpty
                             ? ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-,
+                                borderRadius: BorderRadius.all(Radius.circular(8)),
                                 child: Image.network(
                                   product.image!.startsWith('http')
                                       ? product.image!
@@ -266,8 +263,7 @@ class _ProductsTabState extends State<ProductsTab> {
                                 color: product.stockQuantity > 0 
                                     ? AppColors.success.withOpacity(0.1)
                                     : AppColors.error.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(16),
-,
+                                borderRadius: BorderRadius.all(Radius.circular(6)),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -317,8 +313,7 @@ class _ProductsTabState extends State<ProductsTab> {
                           final confirm = await showDialog<bool>(
                             context: context,
                             builder: (context) => AlertDialog(
-                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
                               title: Row(
                                 children: [
                                   Icon(Icons.warning_rounded, color: AppColors.error),
@@ -389,8 +384,7 @@ class _ProductsTabState extends State<ProductsTab> {
                                     ),
                                     backgroundColor: AppColors.success,
                                     behavior: SnackBarBehavior.floating,
-                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
                                   ),
                                 );
                               } else {
@@ -412,8 +406,7 @@ class _ProductsTabState extends State<ProductsTab> {
                                     backgroundColor: AppColors.error,
                                     behavior: SnackBarBehavior.floating,
                                     duration: Duration(seconds: 4),
-                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
                                   ),
                                 );
                               }
@@ -434,8 +427,7 @@ class _ProductsTabState extends State<ProductsTab> {
         backgroundColor: AppColors.primary,
         icon: Icon(Icons.add_rounded),
         label: Text('Add Product'),
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
       ),
     );
   }

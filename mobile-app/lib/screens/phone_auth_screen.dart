@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -149,7 +149,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.info.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                   border: Border.all(
                     color: AppColors.info.withOpacity(0.3),
                   ),
@@ -191,7 +191,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           ),
         ],
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
       ),
     );
@@ -247,7 +247,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   duration: const Duration(milliseconds: 180),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                     border: Border.all(
                       color: _isPhoneFocused ? AppColors.primary : AppColors.border,
                       width: _isPhoneFocused ? 1.5 : 1,
@@ -328,7 +328,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: AppColors.info.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                     border: Border.all(
                       color: AppColors.info.withOpacity(0.2),
                     ),

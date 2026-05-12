@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -75,8 +75,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
             content: Text('Image ${index + 1} added successfully!'),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
             duration: Duration(seconds: 1),
           ),
         );
@@ -95,8 +94,8 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+
       ),
       builder: (context) {
         return Container(
@@ -110,8 +109,8 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.border,
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
               ),
               SizedBox(height: 24),
@@ -168,14 +167,12 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-,
+      borderRadius: BorderRadius.all(Radius.circular(16)),
       child: Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.all(color: color.withOpacity(0.3)),
         ),
         child: Row(
@@ -184,8 +181,8 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: color,
-                borderRadius: BorderRadius.circular(16),
-,
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+
               ),
               child: Icon(icon, color: Colors.white, size: 24),
             ),
@@ -231,8 +228,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
           content: const Text('Please add at least one product image'),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
         ),
       );
       return;
@@ -276,8 +272,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -321,8 +316,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
                   ),
                   child: const Text(
                     'Perfect',
@@ -347,8 +341,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.all(16),
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),
-),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)),),
           ),
         );
       }
@@ -541,8 +534,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
                             elevation: 8,
                             shadowColor: Colors.black.withOpacity(0.4),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-,
+                              borderRadius: BorderRadius.all(Radius.circular(16)),
                             ),
                             disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
                           ),
@@ -594,8 +586,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
       child: Container(
         decoration: BoxDecoration(
           color: hasImage ? Colors.transparent : AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           border: Border.all(
             color: isPrimary ? AppColors.primary : AppColors.border,
             width: isPrimary ? 2 : 1,
@@ -611,8 +602,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
               : null,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -650,8 +640,8 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(16),
-,
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+
                     ),
                     child: Text(
                       'PRIMARY',
@@ -701,8 +691,8 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-,
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+
       ),
       builder: (context) {
         return Container(
@@ -715,8 +705,8 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.border,
-                  borderRadius: BorderRadius.circular(16),
-,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+
                 ),
               ),
               SizedBox(height: 24),
@@ -792,28 +782,28 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             border: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+
               borderSide: BorderSide(color: AppColors.border, width: 1),
             ),
             enabledBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+
               borderSide: BorderSide(color: AppColors.border, width: 1),
             ),
             focusedBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+
               borderSide: BorderSide(color: AppColors.primary, width: 1.5),
             ),
             errorBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+
               borderSide: BorderSide(color: AppColors.error, width: 1),
             ),
             focusedErrorBorder: const OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+
               borderSide: BorderSide(color: AppColors.error, width: 1.5),
             ),
           ),

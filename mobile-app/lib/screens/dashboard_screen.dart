@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:async';
 import '../providers/store_provider.dart';
 import '../providers/product_provider.dart';
 import '../utils/theme.dart';
@@ -17,10 +18,24 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  Timer? _refreshTimer;
+
   @override
   void initState() {
     super.initState();
     _loadData();
+    // Auto-refresh every 10 seconds for dashboard stats
+    _refreshTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+      if (mounted) {
+        _loadData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -65,9 +80,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: const Text('Dashboard'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: _loadData,
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Center(
+              child: Row(
+                children: const [
+                  Icon(Icons.autorenew, size: 16, color: AppTheme.successColor),
+                  SizedBox(width: 4),
+                  Text(
+                    'Auto',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.successColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -103,8 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             height: 80,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-,
+                              borderRadius: BorderRadius.all(Radius.circular(16)),
                               image: DecorationImage(
                                 image: NetworkImage(store.logo!),
                                 fit: BoxFit.cover,
@@ -117,8 +146,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             height: 80,
                             decoration: const BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-,
+                              borderRadius: BorderRadius.all(Radius.circular(16)),
                             ),
                             child: const Icon(
                               Icons.store_rounded,
