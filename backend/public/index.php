@@ -64,6 +64,16 @@ if ($uri === '/api/health') {
     ]);
 }
 
+// Debug endpoint
+if ($uri === '/api/debug') {
+    sendJson([
+        'success' => true,
+        'uri' => $uri,
+        'method' => $method,
+        'request_uri' => $_SERVER['REQUEST_URI']
+    ]);
+}
+
 // Get products by store ID
 if (preg_match('#^/api/v1/seller/stores/(\d+)/products$#', $uri, $matches) && $method === 'GET') {
     $storeId = $matches[1];
@@ -116,6 +126,244 @@ if ($uri === '/api/v1/stores' && $method === 'GET') {
         sendJson([
             'success' => true,
             'data' => $stores
+        ]);
+        
+    } catch (PDOException $e) {
+        sendJson([
+            'success' => false,
+            'message' => 'Database error: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+// Get store statistics (MUST come before generic store by slug endpoint)
+if (preg_match('#^/api/v1/stores/(\d+)/statistics$#', $uri, $matches) && $method === 'GET') {
+    $storeId = $matches[1];
+    
+    try {
+        // Check if store exists
+        $stmt = $pdo->prepare("SELECT id, name FROM stores WHERE id = ? AND deleted_at IS NULL");
+        $stmt->execute([$storeId]);
+        $store = $stmt->fetch();
+        
+        if (!$store) {
+            sendJson(['success' => false, 'message' => 'Store not found', 'store_id' => $storeId], 404);
+        }
+        
+        // Get statistics
+        $stats = [];
+        
+        // Total revenue (from orders table if exists, otherwise 0)
+        $stmt = $pdo->prepare("
+            SELECT COALESCE(SUM(total_price), 0) as total_revenue
+            FROM orders 
+            WHERE store_id = ? AND status != 'cancelled'
+        ");
+        $stmt->execute([$storeId]);
+        $result = $stmt->fetch();
+        $stats['total_revenue'] = (float)$result['total_revenue'];
+        
+        // Total orders
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total_orders FROM orders WHERE store_id = ?");
+        $stmt->execute([$storeId]);
+        $result = $stmt->fetch();
+        $stats['total_orders'] = (int)$result['total_orders'];
+        
+        // Pending orders
+        $stmt = $pdo->prepare("SELECT COUNT(*) as pending_orders FROM orders WHERE store_id = ? AND status = 'pending'");
+        $stmt->execute([$storeId]);
+        $result = $stmt->fetch();
+        $stats['pending_orders'] = (int)$result['pending_orders'];
+        
+        // Total products
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) as total_products 
+            FROM products 
+            WHERE store_id = ? AND deleted_at IS NULL
+        ");
+        $stmt->execute([$storeId]);
+        $result = $stmt->fetch();
+        $stats['total_products'] = (int)$result['total_products'];
+        
+        // Total clicks (sum of all product clicks)
+        $stmt = $pdo->prepare("
+            SELECT COALESCE(SUM(click_count), 0) as total_clicks 
+            FROM products 
+            WHERE store_id = ? AND deleted_at IS NULL
+        ");
+        $stmt->execute([$storeId]);
+        $result = $stmt->fetch();
+        $stats['total_clicks'] = (int)$result['total_clicks'];
+        
+        // Total views
+        $stmt = $pdo->prepare("SELECT view_count FROM stores WHERE id = ?");
+        $stmt->execute([$storeId]);
+        $result = $stmt->fetch();
+        $stats['total_views'] = (int)($result['view_count'] ?? 0);
+        
+        // Revenue growth (mock data for now)
+        $stats['revenue_growth'] = 12.5;
+        
+        sendJson([
+            'success' => true,
+            'data' => $stats
+        ]);
+        
+    } catch (PDOException $e) {
+        sendJson([
+            'success' => false,
+            'message' => 'Database error: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+// Get store products (MUST come before generic store by slug endpoint)
+if (preg_match('#^/api/v1/stores/(\d+)/products$#', $uri, $matches) && $method === 'GET') {
+    $storeId = $matches[1];
+    
+    try {
+        $stmt = $pdo->prepare("
+            SELECT 
+                id, store_id, name, price, description, image, 
+                stock_quantity, is_active, click_count, created_at, updated_at,
+                CONCAT('₹', FORMAT(price, 2)) as formatted_price
+            FROM products 
+            WHERE store_id = ? AND deleted_at IS NULL
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute([$storeId]);
+        $products = $stmt->fetchAll();
+        
+        // Convert numeric fields to proper types
+        foreach ($products as &$product) {
+            $product['id'] = (int)$product['id'];
+            $product['store_id'] = (int)$product['store_id'];
+            $product['price'] = (float)$product['price'];
+            $product['stock_quantity'] = (int)$product['stock_quantity'];
+            $product['is_active'] = (int)$product['is_active'];
+            $product['click_count'] = (int)$product['click_count'];
+        }
+        
+        sendJson([
+            'success' => true,
+            'data' => $products
+        ]);
+        
+    } catch (PDOException $e) {
+        sendJson([
+            'success' => false,
+            'message' => 'Database error: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+// Get store orders (MUST come before generic store by slug endpoint)
+if (preg_match('#^/api/v1/stores/(\d+)/orders$#', $uri, $matches) && $method === 'GET') {
+    $storeId = $matches[1];
+    
+    try {
+        // Check if store exists
+        $stmt = $pdo->prepare("SELECT id FROM stores WHERE id = ? AND deleted_at IS NULL");
+        $stmt->execute([$storeId]);
+        if (!$stmt->fetch()) {
+            sendJson(['success' => false, 'message' => 'Store not found'], 404);
+        }
+        
+        // Get orders with customer and product details
+        try {
+            $stmt = $pdo->prepare("
+                SELECT 
+                    o.*,
+                    COALESCE(c.name, CONCAT('Customer ', o.customer_id)) as customer_name,
+                    COALESCE(c.phone, '') as customer_phone,
+                    '' as customer_address,
+                    p.name as product_name,
+                    p.image as product_image,
+                    CONCAT('₹', FORMAT(o.total_price, 2)) as formatted_amount
+                FROM orders o
+                LEFT JOIN customers c ON o.customer_id = c.id
+                LEFT JOIN products p ON o.product_id = p.id
+                WHERE o.store_id = ?
+                ORDER BY o.created_at DESC
+                LIMIT 100
+            ");
+            $stmt->execute([$storeId]);
+            $orders = $stmt->fetchAll();
+            
+            // Convert numeric fields to proper types
+            foreach ($orders as &$order) {
+                $order['id'] = (int)$order['id'];
+                $order['store_id'] = (int)$order['store_id'];
+                $order['customer_id'] = (int)$order['customer_id'];
+                $order['product_id'] = (int)$order['product_id'];
+                $order['quantity'] = (int)$order['quantity'];
+                $order['total_price'] = (float)$order['total_price'];
+            }
+        } catch (PDOException $e) {
+            // Orders table might not exist yet
+            $orders = [];
+        }
+        
+        sendJson([
+            'success' => true,
+            'data' => $orders
+        ]);
+        
+    } catch (PDOException $e) {
+        sendJson([
+            'success' => false,
+            'message' => 'Database error: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+// Get store customers (MUST come before generic store by slug endpoint)
+if (preg_match('#^/api/v1/stores/(\d+)/customers$#', $uri, $matches) && $method === 'GET') {
+    $storeId = $matches[1];
+    
+    try {
+        // Check if store exists
+        $stmt = $pdo->prepare("SELECT id FROM stores WHERE id = ? AND deleted_at IS NULL");
+        $stmt->execute([$storeId]);
+        if (!$stmt->fetch()) {
+            sendJson(['success' => false, 'message' => 'Store not found'], 404);
+        }
+        
+        // Get customers (return empty array if table doesn't exist)
+        try {
+            $stmt = $pdo->prepare("
+                SELECT 
+                    o.customer_id,
+                    COALESCE(c.name, CONCAT('Customer ', o.customer_id)) as customer_name,
+                    COALESCE(c.phone, '') as customer_phone,
+                    COALESCE(c.email, '') as customer_email,
+                    COUNT(*) as order_count,
+                    SUM(o.total_price) as total_spent,
+                    MAX(o.created_at) as last_order_date
+                FROM orders o
+                LEFT JOIN customers c ON o.customer_id = c.id
+                WHERE o.store_id = ?
+                GROUP BY o.customer_id
+                ORDER BY total_spent DESC
+                LIMIT 100
+            ");
+            $stmt->execute([$storeId]);
+            $customers = $stmt->fetchAll();
+            
+            // Convert numeric fields to proper types
+            foreach ($customers as &$customer) {
+                $customer['customer_id'] = (int)$customer['customer_id'];
+                $customer['order_count'] = (int)$customer['order_count'];
+                $customer['total_spent'] = (float)$customer['total_spent'];
+            }
+        } catch (PDOException $e) {
+            // Orders table might not exist yet
+            $customers = [];
+        }
+        
+        sendJson([
+            'success' => true,
+            'data' => $customers
         ]);
         
     } catch (PDOException $e) {
@@ -348,6 +596,69 @@ if ($uri === '/api/v1/seller/products' && $method === 'POST') {
             'success' => true,
             'message' => 'Product created successfully',
             'data' => $product
+        ], 201);
+        
+    } catch (PDOException $e) {
+        sendJson([
+            'success' => false,
+            'message' => 'Database error: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+// Create order (from storefront)
+if ($uri === '/api/v1/orders' && $method === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    $storeId = $data['store_id'] ?? null;
+    $productId = $data['product_id'] ?? null;
+    $customerName = $data['name'] ?? '';
+    $customerPhone = $data['phone'] ?? '';
+    $quantity = $data['quantity'] ?? 1;
+    $totalPrice = $data['total_price'] ?? 0;
+    
+    if (empty($storeId) || empty($productId) || empty($customerName) || empty($customerPhone)) {
+        sendJson([
+            'success' => false,
+            'message' => 'Store ID, Product ID, Name, and Phone are required'
+        ], 422);
+    }
+    
+    try {
+        // Check if customer exists in customers table, if not create one
+        $stmt = $pdo->prepare("SELECT id FROM customers WHERE phone = ?");
+        $stmt->execute([$customerPhone]);
+        $customer = $stmt->fetch();
+        
+        if (!$customer) {
+            // Create new customer
+            $stmt = $pdo->prepare("
+                INSERT INTO customers (name, phone, email, created_at, updated_at)
+                VALUES (?, ?, '', NOW(), NOW())
+            ");
+            $stmt->execute([$customerName, $customerPhone]);
+            $customerId = $pdo->lastInsertId();
+        } else {
+            $customerId = $customer['id'];
+        }
+        
+        // Create order
+        $stmt = $pdo->prepare("
+            INSERT INTO orders (store_id, customer_id, product_id, quantity, total_price, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, 'pending', NOW(), NOW())
+        ");
+        
+        $stmt->execute([$storeId, $customerId, $productId, $quantity, $totalPrice]);
+        $orderId = $pdo->lastInsertId();
+        
+        sendJson([
+            'success' => true,
+            'message' => 'Order created successfully',
+            'data' => [
+                'order_id' => $orderId,
+                'customer_id' => $customerId,
+                'status' => 'pending'
+            ]
         ], 201);
         
     } catch (PDOException $e) {

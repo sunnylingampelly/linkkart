@@ -7,7 +7,9 @@ class AppConstants {
   // Multiple endpoints for fallback (tries in order)
   
   static const List<String> baseUrls = [
-    'http://192.168.1.22:8000',   // Current PC IP (primary)
+    'http://192.168.0.9:8000',   // Current PC IP (primary)
+    'http://192.168.1.30:8000',
+    'http://192.168.1.22:8000',
     'http://192.168.1.8:8000',
     'http://192.168.1.25:8000',
     'http://192.168.1.38:8000',
@@ -20,7 +22,7 @@ class AppConstants {
     'http://localhost:8000',
   ];
   
-  static String _baseUrl = 'http://192.168.1.22:8000';
+  static String _baseUrl = 'http://192.168.0.9:8000';
   static String get baseUrl => _baseUrl;
   static set baseUrl(String url) {
     // Strip any accidental /api/v1 path that may have been stored
@@ -39,7 +41,7 @@ class AppConstants {
     }
   }
   
-  static const String storefrontUrl = 'http://192.168.1.22:3002';
+  static const String storefrontUrl = 'http://192.168.0.9:3002';
   
   /// Attempts to find a reachable API URL from the available options
   static Future<void> discoverBaseUrl() async {
