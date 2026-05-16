@@ -558,6 +558,9 @@ if ($uri === '/api/v1/seller/products' && $method === 'POST') {
     }
     
     try {
+        // Generate unique product_id
+        $productIdUnique = 'LK-' . strtoupper(uniqid());
+        
         // Handle image upload
         $image = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -575,13 +578,13 @@ if ($uri === '/api/v1/seller/products' && $method === 'POST') {
             }
         }
         
-        // Insert product
+        // Insert product with product_id
         $stmt = $pdo->prepare("
-            INSERT INTO products (store_id, name, price, description, image, stock_quantity, is_active, click_count, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, 1, 0, NOW(), NOW())
+            INSERT INTO products (store_id, product_id, name, price, description, image, stock_quantity, is_active, click_count, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0, NOW(), NOW())
         ");
         
-        $stmt->execute([$storeId, $name, $price, $description, $image, $stockQuantity]);
+        $stmt->execute([$storeId, $productIdUnique, $name, $price, $description, $image, $stockQuantity]);
         $productId = $pdo->lastInsertId();
         
         // Get created product

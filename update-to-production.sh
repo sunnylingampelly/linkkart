@@ -1,31 +1,60 @@
+#!/bin/bash
+
+###############################################################################
+# Update Mobile App to Production URLs
+# This script updates the mobile app configuration to use production URLs
+###############################################################################
+
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║  Update Mobile App to Production URLs                 ║${NC}"
+echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
+echo ""
+
+# Get production URLs from user
+read -p "Enter your production API URL (e.g., https://api.linkkart.shop): " API_URL
+read -p "Enter your storefront URL (e.g., https://linkkart.shop): " STOREFRONT_URL
+
+echo ""
+echo -e "${YELLOW}Updating mobile app configuration...${NC}"
+
+# Backup original file
+cp mobile-app/lib/utils/constants.dart mobile-app/lib/utils/constants.dart.backup
+echo -e "${GREEN}✓${NC} Backup created: constants.dart.backup"
+
+# Update constants.dart
+cat > mobile-app/lib/utils/constants.dart << 'EOF'
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppConstants {
-  // API Configuration
-  // Multiple endpoints for fallback (tries in order)
+  // API Configuration - PRODUCTION
   
   static const List<String> baseUrls = [
-    'https://api.linkkart.shop',     // Production API (primary)
-    'http://192.168.0.9:8000',       // Local development fallback
-    'http://10.0.2.2:8000',          // Android Emulator
-    'http://127.0.0.1:8000',         // Localhost
-    'http://localhost:8000',
+    'PRODUCTION_API_URL',              // Production API (primary)
+    'http://192.168.0.9:8000',        // Local development fallback
+    'http://10.0.2.2:8000',           // Android Emulator
+    'http://127.0.0.1:8000',          // Localhost
   ];
   
-  static String _baseUrl = 'https://api.linkkart.shop';
+  static String _baseUrl = 'PRODUCTION_API_URL';
   static String get baseUrl => _baseUrl;
   static set baseUrl(String url) {
-    // Strip any accidental /api/v1 path that may have been stored
-    _baseUrl = url.replaceAll(RegExp(r'/api/v1.*$'), '');
+    _baseUrl = url.replaceAll(RegExp(r'/api/v1.*'), '');
   }
 
   /// Call on app startup to wipe any previously corrupted saved URL
   static Future<void> cleanupSavedUrl() async {
     final prefs = await SharedPreferences.getInstance();
     final savedHost = prefs.getString('api_ip') ?? '';
-    // If saved host contains a path (e.g. was saved as full URL), clear it
     if (savedHost.contains('/') || savedHost.contains('api')) {
       await prefs.remove('api_ip');
       await prefs.remove('api_port');
@@ -33,7 +62,7 @@ class AppConstants {
     }
   }
   
-  static const String storefrontUrl = 'https://linkkart.shop';
+  static const String storefrontUrl = 'PRODUCTION_STOREFRONT_URL';
   
   /// Attempts to find a reachable API URL from the available options
   static Future<void> discoverBaseUrl() async {
@@ -46,9 +75,8 @@ class AppConstants {
       final savedPort = prefs.getString('api_port');
       
       if (savedHost != null && savedPort != null) {
-        // Guard: only use saved host if it's a raw IP/hostname, not a full URL
         final cleanHost = savedHost.replaceAll(RegExp(r'http://|https://|/.*'), '');
-        final savedUrl = 'http://$cleanHost:$savedPort';
+        final savedUrl = savedHost.startsWith('http') ? '$savedHost:$savedPort' : 'http://$cleanHost:$savedPort';
         try {
           debugPrint('Probing SAVED API at: $savedUrl/api/health');
           final response = await client.get(
@@ -88,7 +116,6 @@ class AppConstants {
         baseUrl = workingUrl;
         debugPrint('✅ API Discovery: Found reachable backend at $baseUrl');
         
-        // Save only host and port — never the full path
         final uri = Uri.parse(workingUrl);
         await prefs.setString('api_ip', uri.host);
         await prefs.setString('api_port', uri.port.toString());
@@ -108,7 +135,7 @@ class AppConstants {
   static const String analyticsEndpoint = '/api/v1/analytics';
   
   // Authentication
-  static String authToken = ''; // Will be set after login
+  static String authToken = '';
   
   // Storage Keys
   static const String storeIdKey = 'store_id';
@@ -123,7 +150,7 @@ class AppConstants {
   static const String subscriptionUpdatedAtKey = 'subscription_updated_at';
   
   // Validation
-  static const int maxImageSize = 2 * 1024 * 1024; // 2MB
+  static const int maxImageSize = 2 * 1024 * 1024;
   static const List<String> allowedImageTypes = ['jpg', 'jpeg', 'png', 'gif'];
   
   // UI
@@ -139,28 +166,68 @@ class AppConstants {
   static const String successProductUpdated = 'Product updated successfully!';
   static const String successProductDeleted = 'Product deleted successfully!';
   
-  // Helper Methods
-  
   /// Constructs a full image URL from a relative path
-  /// If the path is already a full URL (starts with http), returns it as-is
-  /// Otherwise, prepends the base URL
   static String getImageUrl(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty) {
       return '';
     }
     
-    // If already a full URL, return as-is
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
     
-    // Ensure path starts with /
     final cleanPath = imagePath.startsWith('/') ? imagePath : '/$imagePath';
-    
-    // Use current baseUrl or fallback to first option if empty
     final effectiveBaseUrl = baseUrl.isNotEmpty ? baseUrl : baseUrls[0];
     
-    // Construct full URL
     return '$effectiveBaseUrl$cleanPath';
   }
 }
+EOF
+
+# Replace placeholders with actual URLs
+sed -i "s|PRODUCTION_API_URL|$API_URL|g" mobile-app/lib/utils/constants.dart
+sed -i "s|PRODUCTION_STOREFRONT_URL|$STOREFRONT_URL|g" mobile-app/lib/utils/constants.dart
+
+echo -e "${GREEN}✓${NC} Updated constants.dart with production URLs"
+echo ""
+
+echo -e "${YELLOW}Testing production API...${NC}"
+
+# Test API health endpoint
+if curl -s -f "$API_URL/api/health" > /dev/null; then
+    echo -e "${GREEN}✓${NC} Production API is reachable"
+else
+    echo -e "${RED}✗${NC} Warning: Could not reach production API"
+    echo -e "${YELLOW}  Make sure your API is deployed and accessible${NC}"
+fi
+
+echo ""
+echo -e "${YELLOW}Cleaning and rebuilding mobile app...${NC}"
+
+cd mobile-app
+
+# Clean previous build
+flutter clean
+echo -e "${GREEN}✓${NC} Cleaned previous build"
+
+# Get dependencies
+flutter pub get
+echo -e "${GREEN}✓${NC} Dependencies updated"
+
+echo ""
+echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║  Configuration Updated Successfully!                   ║${NC}"
+echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
+echo ""
+echo -e "${YELLOW}Production URLs:${NC}"
+echo -e "  API:        $API_URL"
+echo -e "  Storefront: $STOREFRONT_URL"
+echo ""
+echo -e "${YELLOW}Next Steps:${NC}"
+echo -e "  1. Build debug APK:    ${GREEN}flutter build apk --debug${NC}"
+echo -e "  2. Test on device:     ${GREEN}flutter run${NC}"
+echo -e "  3. Build release APK:  ${GREEN}flutter build apk --release${NC}"
+echo ""
+echo -e "${YELLOW}APK Location:${NC}"
+echo -e "  build/app/outputs/flutter-apk/app-release.apk"
+echo ""
