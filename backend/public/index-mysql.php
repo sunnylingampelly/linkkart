@@ -296,13 +296,17 @@ if ($uri === '/api/v1/seller/products' && $method === 'POST') {
             }
         }
         
+        // Generate a unique product_id
+        $productIdStr = uniqid('prod_');
+        $stockQuantity = $_POST['stock_quantity'] ?? 0;
+        
         // Insert product
         $stmt = $pdo->prepare("
-            INSERT INTO products (store_id, name, price, description, image, is_active, click_count, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, 1, 0, NOW(), NOW())
+            INSERT INTO products (store_id, product_id, name, price, description, image, stock_quantity, is_active, click_count, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0, NOW(), NOW())
         ");
         
-        $stmt->execute([$storeId, $name, $price, $description, $image]);
+        $stmt->execute([$storeId, $productIdStr, $name, $price, $description, $image, $stockQuantity]);
         $productId = $pdo->lastInsertId();
         
         // Get created product

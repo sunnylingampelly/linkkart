@@ -8,10 +8,10 @@ class AppConstants {
   
   static const List<String> baseUrls = [
     'https://api.linkkart.shop',     // Production API (primary)
-    'http://192.168.0.9:8000',       // Local development fallback
-    'http://10.0.2.2:8000',          // Android Emulator
-    'http://127.0.0.1:8000',         // Localhost
-    'http://localhost:8000',
+    // 'http://192.168.0.9:8000',       // Local development fallback
+    // 'http://10.0.2.2:8000',          // Android Emulator
+    // 'http://127.0.0.1:8000',         // Localhost
+    // 'http://localhost:8000',
   ];
   
   static String _baseUrl = 'https://api.linkkart.shop';
