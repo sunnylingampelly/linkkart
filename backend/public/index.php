@@ -120,7 +120,7 @@ if ($uri === '/api/v1/stores' && $method === 'GET') {
         
         // Add store URLs
         foreach ($stores as &$store) {
-            $store['store_url'] = 'http://localhost:3001/store/' . $store['slug'];
+            $store['store_url'] = 'https://linkkart.shop/store/' . $store['slug'];
         }
         
         sendJson([
@@ -415,7 +415,7 @@ if (preg_match('#^/api/v1/stores/(.+)$#', $uri, $matches)) {
         }
         
         // Add computed fields to store
-        $store['store_url'] = 'http://localhost:3001/store/' . $store['slug'];
+        $store['store_url'] = 'https://linkkart.shop/store/' . $store['slug'];
         $store['product_count'] = count($products);
         $store['products'] = $products;
         
@@ -525,7 +525,7 @@ if ($uri === '/api/v1/seller/stores' && $method === 'POST') {
         $stmt->execute([$storeId]);
         $store = $stmt->fetch();
         
-        $store['store_url'] = 'http://localhost:3001/store/' . $store['slug'];
+        $store['store_url'] = 'https://linkkart.shop/store/' . $store['slug'];
         $store['product_count'] = 0;
         
         sendJson([

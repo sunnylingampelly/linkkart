@@ -1,7 +1,9 @@
 // LinkKart Storefront Configuration
-// IMPORTANT: Update this IP address to match your backend server IP
-// Find your IP: Windows (ipconfig) | Linux/Mac (ifconfig)
-export const API_BASE_URL = 'http://localhost:8000';
+// PRODUCTION: Using live API URL
+export const API_BASE_URL = 'https://api.linkkart.shop';
+
+// LOCAL DEVELOPMENT: Uncomment below for local testing
+// export const API_BASE_URL = 'http://localhost:8000';
 
 // For dynamic detection (if backend runs on same machine as storefront):
 // const currentHost = window.location.hostname;

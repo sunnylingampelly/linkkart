@@ -14,7 +14,7 @@ function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/auth/login', {
+      const response = await axios.post('https://api.linkkart.shop/api/v1/auth/login', {
         email,
         password
       });

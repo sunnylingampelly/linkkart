@@ -529,7 +529,7 @@ if ($uri === '/api/v1/stores' && $method === 'GET') {
         
         // Add computed fields
         foreach ($stores as &$store) {
-            $store['store_url'] = 'http://localhost:3001/store/' . $store['slug'];
+            $store['store_url'] = 'https://linkkart.shop/store/' . $store['slug'];
             $store['product_count'] = (int)$store['product_count'];
         }
         
@@ -639,7 +639,7 @@ if ($uri === '/api/v1/stores/search-by-phone' && $method === 'GET') {
         }
         
         // Add computed fields
-        $store['store_url'] = 'http://localhost:3001/store/' . $store['slug'];
+        $store['store_url'] = 'https://linkkart.shop/store/' . $store['slug'];
         
         sendJson([
             'success' => true,
@@ -701,7 +701,7 @@ if (preg_match('#^/api/v1/stores/([^/]+)$#', $uri, $matches) && $method === 'GET
         $products = $stmt->fetchAll();
         
         // Add computed fields
-        $store['store_url'] = 'http://localhost:3001/store/' . $store['slug'];
+        $store['store_url'] = 'https://linkkart.shop/store/' . $store['slug'];
         $store['product_count'] = count($products);
         $store['products'] = $products;
         
@@ -807,7 +807,7 @@ if ((preg_match('#^/api/v1/stores/(\d+)$#', $uri, $matches) && ($method === 'PUT
         $stmt = $pdo->prepare('SELECT id, name, phone, slug, logo, description, view_count, is_active, created_at, updated_at FROM stores WHERE id = ?');
         $stmt->execute([$storeId]);
         $store = $stmt->fetch();
-        $store['store_url'] = 'http://localhost:3001/store/' . $store['slug'];
+        $store['store_url'] = 'https://linkkart.shop/store/' . $store['slug'];
         
         sendJson(['success' => true, 'message' => 'Store updated successfully', 'data' => $store]);
 
@@ -1234,7 +1234,7 @@ if (($uri === '/api/v1/stores' || $uri === '/api/v1/seller/stores') && $method =
                 'is_active' => (int)$store['is_active'],
                 'view_count' => (int)$store['view_count'],
                 'product_count' => 0,
-                'store_url' => 'http://localhost:3001/store/' . $store['slug'],
+                'store_url' => 'https://linkkart.shop/store/' . $store['slug'],
                 'created_at' => $store['created_at'],
                 'updated_at' => $store['updated_at']
             ]

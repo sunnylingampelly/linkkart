@@ -1,0 +1,85 @@
+╔══════════════════════════════════════════════════════════════════╗
+║              LINKKART PRODUCTION URLS                            ║
+╚══════════════════════════════════════════════════════════════════╝
+
+🌐 LIVE PRODUCTION URLS:
+
+1. STOREFRONT (Customer-facing)
+   URL: https://linkkart.shop
+   Purpose: Public store pages, product listings
+   
+2. ADMIN DASHBOARD (Admin panel)
+   URL: https://admin.linkkart.shop
+   Purpose: Admin management, analytics, plans
+   
+3. BACKEND API (All API calls)
+   URL: https://api.linkkart.shop
+   Purpose: All backend operations, database
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ CONFIGURATION STATUS:
+
+MOBILE APP:
+  File: mobile-app/lib/utils/constants.dart
+  API URL: https://api.linkkart.shop ✅
+  Storefront: https://linkkart.shop ✅
+  Status: CONFIGURED
+
+STOREFRONT:
+  File: storefront/src/config.js
+  API URL: https://api.linkkart.shop ✅
+  Status: CONFIGURED
+
+ADMIN DASHBOARD:
+  File: admin-dashboard/src/config.js
+  API URL: https://api.linkkart.shop ✅
+  Status: CONFIGURED
+
+BACKEND API:
+  Files: backend/public/*.php
+  Store URLs: https://linkkart.shop/store/{slug} ✅
+  Status: CONFIGURED
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 URL MAPPING:
+
+User Journey:
+1. User visits: https://linkkart.shop
+2. Clicks store → https://linkkart.shop/store/luxury-fashion
+3. Mobile app calls → https://api.linkkart.shop/api/v1/stores
+4. Admin logs in → https://admin.linkkart.shop/login
+
+API Endpoints:
+- Health: https://api.linkkart.shop/api/health
+- Stores: https://api.linkkart.shop/api/v1/stores
+- Products: https://api.linkkart.shop/api/v1/products
+- Plans: https://api.linkkart.shop/api/v1/plans
+- Auth: https://api.linkkart.shop/api/v1/auth/login
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 QUICK REFERENCE:
+
+MOBILE APP BUILD:
+  cd mobile-app
+  flutter build apk --release
+  → Uses: https://api.linkkart.shop
+
+STOREFRONT BUILD:
+  cd storefront
+  npm run build
+  → Deploy to: https://linkkart.shop
+  → Calls: https://api.linkkart.shop
+
+ADMIN BUILD:
+  cd admin-dashboard
+  npm run build
+  → Deploy to: https://admin.linkkart.shop
+  → Calls: https://api.linkkart.shop
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ ALL SYSTEMS READY FOR PRODUCTION!
+

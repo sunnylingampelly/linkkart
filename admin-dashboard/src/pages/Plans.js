@@ -17,7 +17,7 @@ function Plans() {
       setLoading(true);
       setError('');
       const token = localStorage.getItem('admin_token');
-      const response = await axios.get('http://localhost:8000/api/v1/admin/plans', {
+      const response = await axios.get('https://api.linkkart.shop/api/v1/admin/plans', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setPlans(response.data?.data || []);
@@ -40,7 +40,7 @@ function Plans() {
       setError('');
       const token = localStorage.getItem('admin_token');
       await axios.put(
-        `http://localhost:8000/api/v1/admin/plans/${plan.id}`,
+        `https://api.linkkart.shop/api/v1/admin/plans/${plan.id}`,
         {
           name: plan.name,
           price: Number(plan.price),

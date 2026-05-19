@@ -18,14 +18,35 @@ class PricingScreen extends StatefulWidget {
 
 class _PricingScreenState extends State<PricingScreen> {
   final ApiService _apiService = ApiService();
+  final SubscriptionService _subscriptionService = SubscriptionService();
   List<Plan> _plans = [];
   bool _loading = true;
   String? _error;
+  Map<String, dynamic>? _currentPlan;
 
   @override
   void initState() {
     super.initState();
-    _loadPlans();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await Future.wait([
+      _loadPlans(),
+      _loadCurrentPlan(),
+    ]);
+  }
+
+  Future<void> _loadCurrentPlan() async {
+    try {
+      final plan = await _subscriptionService.getCurrentPlan();
+      if (!mounted) return;
+      setState(() {
+        _currentPlan = plan;
+      });
+    } catch (e) {
+      print('Error loading current plan: $e');
+    }
   }
 
   Future<void> _loadPlans() async {
@@ -201,6 +222,41 @@ class _PricingScreenState extends State<PricingScreen> {
   Widget _buildPlanCard(Plan plan) {
     final isPopular = plan.slug == 'starter';
     final isFree = plan.price == 0;
+    final isCurrentPlan = _currentPlan != null && 
+        (_currentPlan!['slug'] == plan.slug || 
+         (_currentPlan!['slug'] == 'free' && plan.slug == 'free'));
+    
+    // Determine button text and action
+    String buttonText;
+    Color buttonColor;
+    Color textColor;
+    bool hasAction = true;
+    
+    if (isCurrentPlan) {
+      buttonText = 'CURRENT PLAN';
+      buttonColor = Colors.transparent;
+      textColor = AppColors.secondary;
+      hasAction = false;
+    } else if (_currentPlan != null) {
+      final currentPrice = _currentPlan!['price'] ?? 0.0;
+      if (plan.price > currentPrice) {
+        buttonText = 'UPGRADE TO ${plan.name}'.toUpperCase();
+        buttonColor = AppColors.primary;
+        textColor = Colors.white;
+      } else if (plan.price < currentPrice) {
+        buttonText = 'DOWNGRADE TO ${plan.name}'.toUpperCase();
+        buttonColor = Colors.transparent;
+        textColor = AppColors.primary;
+      } else {
+        buttonText = 'SELECT ${plan.name}'.toUpperCase();
+        buttonColor = AppColors.primary;
+        textColor = Colors.white;
+      }
+    } else {
+      buttonText = isFree ? 'START FREE TRIAL' : 'SELECT ${plan.name}'.toUpperCase();
+      buttonColor = isFree ? Colors.transparent : AppColors.primary;
+      textColor = isFree ? AppColors.primary : Colors.white;
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
@@ -208,8 +264,10 @@ class _PricingScreenState extends State<PricingScreen> {
         color: AppColors.surface,
         borderRadius: BorderRadius.all(Radius.circular(16)),
         border: Border.all(
-          color: isPopular ? AppColors.secondary : AppColors.border,
-          width: isPopular ? 2 : 1,
+          color: isCurrentPlan 
+              ? AppColors.secondary 
+              : (isPopular ? AppColors.secondary : AppColors.border),
+          width: isCurrentPlan || isPopular ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -222,7 +280,25 @@ class _PricingScreenState extends State<PricingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (isPopular)
+          if (isCurrentPlan)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: const BoxDecoration(
+                color: AppColors.secondary,
+              ),
+              child: Text(
+                'YOUR CURRENT PLAN',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
+              ),
+            )
+          else if (isPopular)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -327,19 +403,22 @@ class _PricingScreenState extends State<PricingScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () => _selectPlan(plan),
+                    onPressed: hasAction ? () => _selectPlan(plan) : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isFree ? Colors.transparent : AppColors.primary,
-                      foregroundColor: isFree ? AppColors.primary : Colors.white,
-                      side: isFree ? const BorderSide(color: AppColors.primary, width: 2) : null,
+                      backgroundColor: buttonColor,
+                      foregroundColor: textColor,
+                      side: buttonColor == Colors.transparent 
+                          ? BorderSide(color: textColor, width: 2) 
+                          : null,
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(16)),
-
                       ),
                       elevation: 0,
+                      disabledBackgroundColor: Colors.transparent,
+                      disabledForegroundColor: AppColors.secondary,
                     ),
                     child: Text(
-                      (isFree ? 'EXPLORE' : 'SELECT ${plan.name}').toUpperCase(),
+                      buttonText,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
@@ -366,18 +445,68 @@ class _PricingScreenState extends State<PricingScreen> {
       );
       return;
     }
+    
+    // Check if this is current plan
+    if (_currentPlan != null && _currentPlan!['slug'] == plan.slug) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This is already your current plan.'),
+          backgroundColor: AppColors.secondary,
+        ),
+      );
+      return;
+    }
+    
     if (plan.price == 0) {
       // Free plan - create subscription directly
       _createFreeSubscription(plan);
     } else {
-      // Paid plan - go to payment screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PaymentScreen(
-            storeId: widget.storeId,
-            plan: plan,
+      // Paid plan - show confirmation for upgrade/downgrade
+      final currentPrice = _currentPlan?['price'] ?? 0.0;
+      final isUpgrade = plan.price > currentPrice;
+      
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(
+            isUpgrade ? 'Upgrade Plan?' : 'Change Plan?',
+            style: GoogleFonts.playfairDisplay(
+              fontWeight: FontWeight.bold,
+            ),
           ),
+          content: Text(
+            isUpgrade
+                ? 'Upgrade to ${plan.name} plan for ₹${plan.price.toStringAsFixed(0)}/month?'
+                : 'Switch to ${plan.name} plan for ₹${plan.price.toStringAsFixed(0)}/month?',
+            style: GoogleFonts.inter(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('CANCEL', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentScreen(
+                      storeId: widget.storeId,
+                      plan: plan,
+                    ),
+                  ),
+                ).then((_) => _loadCurrentPlan()); // Reload after payment
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
+              child: Text(
+                'CONTINUE',
+                style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -401,6 +530,9 @@ class _PricingScreenState extends State<PricingScreen> {
         plan: plan,
         status: 'trial',
       );
+
+      // Reload current plan
+      await _loadCurrentPlan();
 
       Navigator.pop(context); // Close loading
       Navigator.pop(context); // Go back

@@ -53,7 +53,7 @@ function CheckoutDrawer({ isOpen, onClose, product, store, quantity, total }) {
       // Create order in backend
       const urls = [
         API_ENDPOINTS.ORDERS,
-        'http://localhost:8000/api/v1/orders'
+        'https://api.linkkart.shop/api/v1/orders'
       ];
       
       let success = false;

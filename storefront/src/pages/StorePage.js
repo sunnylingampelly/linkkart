@@ -26,7 +26,7 @@ function StorePage() {
       // Try multiple URLs
       const urls = [
         `${API_ENDPOINTS.STORES}/${slug}`,
-        `http://localhost:8000/api/v1/stores/${slug}`
+        `https://api.linkkart.shop/api/v1/stores/${slug}`
       ];
       
       let response = null;
@@ -72,7 +72,7 @@ function StorePage() {
       if (!store) return;
       const urls = [
         `${API_ENDPOINTS.ANALYTICS}/track`,
-        'http://localhost:8000/api/v1/analytics/track'
+        'https://api.linkkart.shop/api/v1/analytics/track'
       ];
       
       for (const url of urls) {

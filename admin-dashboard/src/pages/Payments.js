@@ -15,7 +15,7 @@ function Payments() {
     try {
       setLoading(true);
       const token = localStorage.getItem('admin_token');
-      const response = await axios.get('http://localhost:8000/api/v1/payments/history', {
+      const response = await axios.get('https://api.linkkart.shop/api/v1/payments/history', {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
       setPayments(response.data.data || []);

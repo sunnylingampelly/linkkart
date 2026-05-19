@@ -20,12 +20,12 @@ function Dashboard() {
       setLoading(true);
       const token = localStorage.getItem('admin_token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const storesRes = await axios.get('http://localhost:8000/api/v1/stores', { headers });
+      const storesRes = await axios.get('https://api.linkkart.shop/api/v1/stores', { headers });
       const stores = storesRes.data.data || [];
-      const paymentsRes = await axios.get('http://localhost:8000/api/v1/payments/history', { headers }).catch(() => ({ data: { data: [] } }));
+      const paymentsRes = await axios.get('https://api.linkkart.shop/api/v1/payments/history', { headers }).catch(() => ({ data: { data: [] } }));
       const payments = paymentsRes.data.data || [];
       const revenue = payments.filter(p => p.status === 'success').reduce((sum, p) => sum + Number(p.amount), 0);
-      const analyticsRes = await axios.get('http://localhost:8000/api/v1/analytics', { headers }).catch(() => ({ data: { data: [] } }));
+      const analyticsRes = await axios.get('https://api.linkkart.shop/api/v1/analytics', { headers }).catch(() => ({ data: { data: [] } }));
       const analytics = analyticsRes.data.data || [];
       const clicks = analytics.filter(a => a.event_type === 'click' || a.event_type === 'product_click').length;
       

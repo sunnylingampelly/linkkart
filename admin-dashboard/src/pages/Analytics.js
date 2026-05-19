@@ -22,11 +22,11 @@ function Analytics() {
             setLoading(true);
 
             // Fetch analytics events - using the aliased endpoint
-            const analyticsRes = await axios.get('http://localhost:8000/analytics');
+            const analyticsRes = await axios.get('https://api.linkkart.shop/analytics');
             const analyticsData = analyticsRes.data.data || [];
 
             // Fetch stores - using the aliased endpoint
-            const storesRes = await axios.get('http://localhost:8000/stores');
+            const storesRes = await axios.get('https://api.linkkart.shop/stores');
             const storesData = storesRes.data.data || [];
 
             setAnalytics(analyticsData);

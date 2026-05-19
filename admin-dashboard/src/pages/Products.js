@@ -18,7 +18,7 @@ function Products() {
       setLoading(true);
       
       // Fetch stores first
-      const storesRes = await axios.get('http://localhost:8000/stores');
+      const storesRes = await axios.get('https://api.linkkart.shop/stores');
       const storesData = storesRes.data.data || [];
       setStores(storesData);
       
@@ -26,7 +26,7 @@ function Products() {
       let allProducts = [];
       for (const store of storesData) {
         try {
-          const productsRes = await axios.get(`http://localhost:8000/products/${store.id}`);
+          const productsRes = await axios.get(`https://api.linkkart.shop/products/${store.id}`);
           if (productsRes.data.data) {
             const productsWithStore = productsRes.data.data.map(p => ({
               ...p,

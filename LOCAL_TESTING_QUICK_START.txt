@@ -1,0 +1,135 @@
+╔══════════════════════════════════════════════════════════════════╗
+║              LOCAL TESTING - QUICK START                         ║
+╚══════════════════════════════════════════════════════════════════╝
+
+🎯 GOAL: Test storefront with images locally before production
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ WHAT'S READY:
+
+1. Storefront config ✅
+   - Set to localhost:8000
+   - Ready for local testing
+
+2. Demo stores SQL ✅
+   - 8 beautiful stores with images
+   - Ready to import
+
+3. Check script ✅
+   - Verifies database state
+   - Shows image status
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 QUICK START (3 Steps):
+
+STEP 1: Import Demo Stores (2 min)
+  mysql -u root -p linkkart < ADD_DEMO_STORES_WITH_IMAGES.sql
+
+STEP 2: Check Database (1 min)
+  php check_current_stores.php
+
+STEP 3: Start Everything (1 min)
+  Double-click: START_LOCAL_TESTING.bat
+
+  OR manually:
+  
+  Terminal 1:
+    cd backend\public
+    php -S localhost:8000
+
+  Terminal 2:
+    cd storefront
+    npm start
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 WHAT TO CHECK:
+
+Open: http://localhost:3000
+
+✅ Homepage loads
+✅ Hero section displays
+✅ "Our Stores" section shows 8 stores
+✅ **Store images are visible** ✨
+✅ Store names display correctly
+✅ Store cards are clickable
+✅ No console errors (F12)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 DEMO STORES:
+
+1. Luxury Fashion Boutique 👗
+2. Tech Gadgets Pro 📱
+3. Home Decor Paradise 🏠
+4. Organic Wellness Store 🌿
+5. Sports & Fitness Hub ⚽
+6. Artisan Jewelry Collection 💎
+7. Kids Wonderland 🧸
+8. Gourmet Food Market 🍷
+
+Each with beautiful Unsplash images!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚨 TROUBLESHOOTING:
+
+Images not showing?
+  1. Check backend running: curl http://localhost:8000/api/health
+  2. Check database: php check_current_stores.php
+  3. Check browser console (F12) for errors
+
+CORS errors?
+  - Backend should have CORS headers enabled
+  - Check backend/public/index.php
+
+Port already in use?
+  - Backend: Use php -S localhost:8001
+  - Storefront: set PORT=3001 && npm start
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📁 FILES TO USE:
+
+⭐ ADD_DEMO_STORES_WITH_IMAGES.sql  → Import this
+⭐ check_current_stores.php         → Run this
+⭐ START_LOCAL_TESTING.bat          → Double-click this
+⭐ TEST_LOCALLY_NOW.md              → Read for details
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SUCCESS CHECKLIST:
+
+□ XAMPP running (Apache + MySQL)
+□ Demo stores imported
+□ Database verified (8 stores with images)
+□ Backend running (localhost:8000)
+□ Storefront running (localhost:3000)
+□ Homepage loads
+□ Store images display
+□ No console errors
+□ Store pages work
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏱️  TOTAL TIME: 5 minutes
+🔒 RISK LEVEL: None (local testing)
+✅ READY TO TEST: YES
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 START NOW:
+
+1. mysql -u root -p linkkart < ADD_DEMO_STORES_WITH_IMAGES.sql
+2. php check_current_stores.php
+3. Double-click START_LOCAL_TESTING.bat
+4. Open http://localhost:3000
+5. Enjoy beautiful storefront with images! 🖼️
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+                    🚀 LET'S TEST LOCALLY! 🧪
+
+╚══════════════════════════════════════════════════════════════════╝

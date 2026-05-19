@@ -15,7 +15,7 @@ function Stores() {
     try {
       setLoading(true);
       const token = localStorage.getItem('admin_token');
-      const response = await axios.get('http://localhost:8000/api/v1/stores', {
+      const response = await axios.get('https://api.linkkart.shop/api/v1/stores', {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
       setStores(response.data.data || []);
@@ -96,7 +96,7 @@ function Stores() {
                   <td>
                     <div className="action-btns">
                       <a 
-                        href={`http://localhost:3001/store/${store.slug}`} 
+                        href={`https://linkkart.shop/store/${store.slug}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="btn btn-outline"

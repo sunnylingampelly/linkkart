@@ -20,7 +20,7 @@ function HomePage() {
       
       const urls = [
         API_ENDPOINTS.STORES,
-        'http://localhost:8000/api/v1/stores'
+        'https://api.linkkart.shop/api/v1/stores'
       ];
       
       let response = null;
