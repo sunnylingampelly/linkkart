@@ -40,11 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Load JWT library
 require_once __DIR__ . '/../lib/JWT.php';
 
-// Database connection
-$host = 'localhost';
-$dbname = 'linkkart';
-$username = 'root';
-$password = '';
+// Database connection - read from environment variables
+$host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost';
+$dbname = $_ENV['DB_DATABASE'] ?? getenv('DB_DATABASE') ?: 'linkkart';
+$username = $_ENV['DB_USERNAME'] ?? getenv('DB_USERNAME') ?: 'root';
+$password = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?: '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
@@ -88,6 +88,177 @@ if ($uri === '/api/health') {
         'status' => 'healthy',
         'timestamp' => time()
     ]);
+}
+
+// Database configuration check endpoint
+if ($uri === '/api/check-db' || $uri === '/check_db_config.php' || $uri === '/check-db') {
+    $diagnostics = [
+        'timestamp' => date('Y-m-d H:i:s'),
+        'database_config' => [
+            'host' => $host,
+            'database' => $dbname,
+            'username' => $username,
+            'password_set' => !empty($password)
+        ],
+        'connection_status' => 'connected',
+        'checks' => []
+    ];
+    
+    try {
+        // Check tables
+        $stmt = $pdo->query("SHOW TABLES");
+        $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        
+        $diagnostics['checks']['tables'] = [
+            'status' => 'success',
+            'count' => count($tables),
+            'tables' => $tables
+        ];
+        
+        // Check required tables
+        $requiredTables = ['stores', 'products', 'analytics_events', 'admins'];
+        $missingTables = array_diff($requiredTables, $tables);
+        
+        if (!empty($missingTables)) {
+            $diagnostics['checks']['required_tables'] = [
+                'status' => 'warning',
+                'missing' => array_values($missingTables)
+            ];
+        } else {
+            $diagnostics['checks']['required_tables'] = [
+                'status' => 'success',
+                'message' => 'All required tables exist'
+            ];
+        }
+        
+        // Check stores count
+        if (in_array('stores', $tables)) {
+            $stmt = $pdo->query("SELECT COUNT(*) FROM stores");
+            $storeCount = $stmt->fetchColumn();
+            $diagnostics['checks']['stores'] = [
+                'status' => 'success',
+                'count' => $storeCount
+            ];
+        }
+        
+        // Check products count
+        if (in_array('products', $tables)) {
+            $stmt = $pdo->query("SELECT COUNT(*) FROM products");
+            $productCount = $stmt->fetchColumn();
+            $diagnostics['checks']['products'] = [
+                'status' => 'success',
+                'count' => $productCount
+            ];
+        }
+        
+        $diagnostics['overall_status'] = empty($missingTables) ? 'HEALTHY' : 'NEEDS_ATTENTION';
+        
+    } catch (PDOException $e) {
+        $diagnostics['checks']['error'] = [
+            'status' => 'failed',
+            'error' => $e->getMessage()
+        ];
+        $diagnostics['overall_status'] = 'ERROR';
+    }
+    
+    sendJson($diagnostics);
+}
+
+// Product creation test endpoint
+if ($uri === '/api/test-product' || $uri === '/test_product_creation.php' || $uri === '/test-product') {
+    $diagnostics = [
+        'timestamp' => date('Y-m-d H:i:s'),
+        'checks' => []
+    ];
+    
+    // Check database connection
+    $diagnostics['checks']['db_connection'] = [
+        'status' => 'success',
+        'message' => 'Database connected',
+        'config' => [
+            'host' => $host,
+            'database' => $dbname,
+            'user' => $username
+        ]
+    ];
+    
+    try {
+        // Check products table
+        $stmt = $pdo->query("SHOW TABLES LIKE 'products'");
+        $tableExists = $stmt->rowCount() > 0;
+        
+        $diagnostics['checks']['products_table'] = [
+            'exists' => $tableExists,
+            'status' => $tableExists ? 'success' : 'failed'
+        ];
+        
+        if ($tableExists) {
+            // Check table structure
+            $stmt = $pdo->query("DESCRIBE products");
+            $columns = $stmt->fetchAll();
+            $columnNames = array_column($columns, 'Field');
+            
+            $diagnostics['checks']['table_structure'] = [
+                'status' => 'success',
+                'columns' => $columnNames
+            ];
+            
+            // Check if stores exist
+            $stmt = $pdo->query("SELECT COUNT(*) FROM stores");
+            $storeCount = $stmt->fetchColumn();
+            
+            $diagnostics['checks']['stores'] = [
+                'status' => 'success',
+                'count' => $storeCount
+            ];
+            
+            // Try test insertion if stores exist
+            if ($storeCount > 0) {
+                $stmt = $pdo->query("SELECT id FROM stores LIMIT 1");
+                $store = $stmt->fetch();
+                $storeId = $store['id'];
+                
+                $testProductId = 'TEST-' . uniqid();
+                
+                $stmt = $pdo->prepare("
+                    INSERT INTO products (store_id, product_id, name, price, stock_quantity, is_active, click_count, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, 1, 0, NOW(), NOW())
+                ");
+                
+                $result = $stmt->execute([$storeId, $testProductId, 'Test Product', 99.99, 10]);
+                
+                if ($result) {
+                    $insertedId = $pdo->lastInsertId();
+                    
+                    // Delete test product
+                    $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
+                    $stmt->execute([$insertedId]);
+                    
+                    $diagnostics['checks']['test_insertion'] = [
+                        'status' => 'success',
+                        'message' => 'Test product created and deleted successfully'
+                    ];
+                }
+            } else {
+                $diagnostics['checks']['test_insertion'] = [
+                    'status' => 'skipped',
+                    'reason' => 'No stores found'
+                ];
+            }
+        }
+        
+        $diagnostics['overall_status'] = 'ALL_CHECKS_PASSED';
+        
+    } catch (PDOException $e) {
+        $diagnostics['checks']['error'] = [
+            'status' => 'failed',
+            'error' => $e->getMessage(),
+            'code' => $e->getCode()
+        ];
+        $diagnostics['overall_status'] = 'SOME_CHECKS_FAILED';
+    }
+    
+    sendJson($diagnostics);
 }
 
 // Handle method override for PUT/DELETE via POST

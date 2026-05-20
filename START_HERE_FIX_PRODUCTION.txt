@@ -1,0 +1,107 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                    🚨 PRODUCTION ERROR FIX - START HERE 🚨                   ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PROBLEM:
+--------
+Product creation failing with "API Error: 500 - DATABASE_ERROR"
+
+ROOT CAUSE:
+-----------
+Backend using hardcoded database credentials (localhost/root/no password)
+instead of your production database credentials.
+
+SOLUTION (3 STEPS):
+-------------------
+
+┌─ STEP 1: CHECK CURRENT STATUS ────────────────────────────────────────────┐
+│                                                                            │
+│  Open this URL in your browser:                                           │
+│  https://api.linkkart.shop/api/check-db                                   │
+│                                                                            │
+│  This shows:                                                               │
+│  • Current database settings                                              │
+│  • Connection status                                                       │
+│  • What tables exist                                                       │
+│  • What needs fixing                                                       │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ STEP 2: UPDATE PRODUCTION .ENV FILE ─────────────────────────────────────┐
+│                                                                            │
+│  SSH into your server:                                                     │
+│  $ ssh your_user@your_server                                              │
+│  $ cd /path/to/backend                                                     │
+│  $ nano .env                                                               │
+│                                                                            │
+│  Update these lines with YOUR ACTUAL credentials:                         │
+│                                                                            │
+│  DB_HOST=localhost                                                         │
+│  DB_DATABASE=linkkart                                                      │
+│  DB_USERNAME=your_actual_db_username                                       │
+│  DB_PASSWORD=your_actual_db_password                                       │
+│                                                                            │
+│  Save: Ctrl+X, then Y, then Enter                                          │
+│                                                                            │
+│  Don't know your credentials? Check cPanel → MySQL Databases              │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ STEP 3: UPLOAD FIXED BACKEND FILES ──────────────────────────────────────┐
+│                                                                            │
+│  Upload these 2 files to your production server:                          │
+│  • backend/public/index.php                                               │
+│  • backend/public/api.php                                                 │
+│                                                                            │
+│  Using FileZilla/FTP:                                                      │
+│  1. Connect to your server                                                │
+│  2. Navigate to /public_html/backend/public/                              │
+│  3. Upload both files (overwrite existing)                                │
+│                                                                            │
+│  OR using Git:                                                             │
+│  $ git add backend/public/*.php                                           │
+│  $ git commit -m "Fix database connection"                                │
+│  $ git push                                                                │
+│  (then git pull on production server)                                      │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+VERIFY IT WORKS:
+----------------
+
+✓ Test 1: https://api.linkkart.shop/api/health
+  Should show: "database": "Connected"
+
+✓ Test 2: https://api.linkkart.shop/api/test-product
+  Should show: "overall_status": "ALL_CHECKS_PASSED"
+
+✓ Test 3: Open mobile app → Products → Add Product
+  Should work without errors!
+
+NEED HELP?
+----------
+
+Run the diagnostic and share the output:
+https://api.linkkart.shop/api/check-db
+
+Read detailed guides:
+• QUICK_FIX_STEPS.md - Fast 3-step guide
+• CRITICAL_FIX_DATABASE_CONNECTION.md - Full technical details
+• FIX_PRODUCT_CREATION_ERROR.md - Troubleshooting guide
+
+FILES CHANGED:
+--------------
+✓ backend/public/index.php - Now reads from .env
+✓ backend/public/api.php - Now reads from .env
+✓ backend/public/check_db_config.php - New diagnostic tool
+✓ backend/public/test_product_creation.php - New test script
+
+TIME TO FIX: 5-10 minutes
+PRIORITY: 🚨 CRITICAL
+STATUS: Code ready, needs .env update
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  START WITH STEP 1: https://api.linkkart.shop/api/check-db                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
