@@ -41,6 +41,17 @@ function HomePage() {
       
       if (response && response.data.success && response.data.data) {
         console.log('Setting stores:', response.data.data);
+        // Log first store's image info for debugging
+        if (response.data.data.length > 0) {
+          const firstStore = response.data.data[0];
+          console.log('First store image info:', {
+            name: firstStore.name,
+            logo: firstStore.logo,
+            image: firstStore.image,
+            hasLogo: !!firstStore.logo,
+            hasImage: !!firstStore.image
+          });
+        }
         setStores(response.data.data);
       } else {
         console.error('❌ No valid response from any URL');
@@ -144,18 +155,23 @@ function HomePage() {
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="store-image-container">
-                    {(store.image || store.logo) ? (
+                    {(store.logo || store.image) ? (
                       <img 
-                        src={store.image || store.logo} 
+                        src={
+                          (store.logo || store.image).startsWith('http') 
+                            ? (store.logo || store.image)
+                            : `${API_BASE_URL}${store.logo || store.image}`
+                        }
                         alt={store.name} 
                         className="store-image"
                         onError={(e) => {
+                          console.error('Image failed to load:', e.target.src);
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
                         }}
                       />
                     ) : null}
-                    <div className="store-image-placeholder" style={{ display: (store.image || store.logo) ? 'none' : 'flex' }}>
+                    <div className="store-image-placeholder" style={{ display: (store.logo || store.image) ? 'none' : 'flex' }}>
                       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                       </svg>
