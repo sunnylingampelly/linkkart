@@ -261,6 +261,55 @@ if ($uri === '/api/test-product' || $uri === '/test_product_creation.php' || $ur
     sendJson($diagnostics);
 }
 
+// Store subscription check endpoint
+if ($uri === '/api/check-stores' || $uri === '/api/stores-status') {
+    try {
+        $stmt = $pdo->query("
+            SELECT 
+                s.id,
+                s.name,
+                s.slug,
+                s.subscription_id,
+                sub.status as subscription_status,
+                sub.plan_id,
+                p.name as plan_name,
+                p.slug as plan_slug,
+                p.product_limit,
+                (SELECT COUNT(*) FROM products WHERE store_id = s.id AND deleted_at IS NULL) as product_count
+            FROM stores s
+            LEFT JOIN subscriptions sub ON s.subscription_id = sub.id
+            LEFT JOIN plans p ON sub.plan_id = p.id
+            WHERE s.deleted_at IS NULL
+        ");
+        
+        $stores = $stmt->fetchAll();
+        
+        $issues = [];
+        foreach ($stores as $store) {
+            if (empty($store['subscription_id'])) {
+                $issues[] = "Store '{$store['name']}' (ID: {$store['id']}) has no subscription";
+            }
+            if (empty($store['plan_id'])) {
+                $issues[] = "Store '{$store['name']}' (ID: {$store['id']}) has no plan assigned";
+            }
+        }
+        
+        sendJson([
+            'success' => true,
+            'stores' => $stores,
+            'issues' => $issues,
+            'needs_fix' => !empty($issues),
+            'fix_instructions' => empty($issues) ? null : 'Run FIX_STORE_SUBSCRIPTIONS.sql to assign free plans to stores'
+        ]);
+        
+    } catch (PDOException $e) {
+        sendJson([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
 // Handle method override for PUT/DELETE via POST
 if ($method === 'POST' && isset($_POST['_method'])) {
     $method = strtoupper($_POST['_method']);
