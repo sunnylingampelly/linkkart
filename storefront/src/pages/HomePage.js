@@ -144,15 +144,22 @@ function HomePage() {
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="store-image-container">
-                    {store.logo ? (
-                      <img src={store.logo} alt={store.name} className="store-image" />
-                    ) : (
-                      <div className="store-image-placeholder">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                      </div>
-                    )}
+                    {(store.image || store.logo) ? (
+                      <img 
+                        src={store.image || store.logo} 
+                        alt={store.name} 
+                        className="store-image"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div className="store-image-placeholder" style={{ display: (store.image || store.logo) ? 'none' : 'flex' }}>
+                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                      </svg>
+                    </div>
                     <div className="store-overlay">
                       <span className="store-view-btn">View Store →</span>
                     </div>
@@ -160,7 +167,7 @@ function HomePage() {
                   <div className="store-info">
                     <h3 className="store-title">{store.name}</h3>
                     <p className="store-description">
-                      Premium products curated with care
+                      {store.description || 'Premium products curated with care'}
                     </p>
                   </div>
                 </Link>
