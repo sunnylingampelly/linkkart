@@ -1,0 +1,48 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    CLEAR YOUR MYSQL SESSION FIRST                          ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+Your MySQL prompt has old error messages mixed in. Let's start fresh.
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: Exit MySQL and reconnect                                          │
+└────────────────────────────────────────────────────────────────────────────┘
+
+Type this in your current MySQL session:
+
+exit;
+
+Then reconnect:
+
+mysql -u linkkart -p linkkart
+
+Enter your password when prompted.
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: Now run these commands ONE AT A TIME                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+After you see a clean mysql> prompt, copy ONLY this line:
+
+ALTER TABLE stores MODIFY COLUMN subscription_id INT NULL;
+
+Press Enter. Wait for result.
+
+Then copy ONLY this line:
+
+ALTER TABLE stores ADD CONSTRAINT fk_stores_subscription FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE SET NULL;
+
+Press Enter. Wait for result.
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: Verify                                                             │
+└────────────────────────────────────────────────────────────────────────────┘
+
+DESCRIBE stores;
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║  IMPORTANT: Make sure you see a clean "mysql>" prompt before each command ║
+╚════════════════════════════════════════════════════════════════════════════╝

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\AnalyticsController;
+use App\Http\Controllers\Api\SubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/stores', [StoreController::class, 'index']);
     Route::get('/stores/search-by-phone', [StoreController::class, 'findByPhone']);
     Route::get('/stores/{identifier}', [StoreController::class, 'show']);
+    
+    // Plans
+    Route::get('/plans', [SubscriptionController::class, 'plans']);
+    
     Route::get('/debug/cleanup-db', function() {
         \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         \DB::table('products')->truncate();
@@ -42,6 +47,10 @@ Route::prefix('v1/seller')->group(function () {
     Route::post('/products/{product}/update', [ProductController::class, 'update']);
     Route::apiResource('products', ProductController::class);
     Route::get('/stores/{storeId}/products', [ProductController::class, 'index']);
+    
+    // Subscriptions
+    Route::post('/subscriptions', [SubscriptionController::class, 'store']);
+    Route::post('/payments/verify', [SubscriptionController::class, 'verifyPayment']);
 });
 
 // Admin routes (protected)

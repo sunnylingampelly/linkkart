@@ -11,6 +11,9 @@ class Product {
   final List<String> images; // Multiple images support
   final int stockQuantity;
   final bool isActive;
+  final bool hasSizes;
+  final Map<String, int>? sizes; // Map of size to quantity
+  final String? sizeChartImage;
   final int clickCount;
   final String formattedPrice;
   final String whatsappUrl;
@@ -28,6 +31,9 @@ class Product {
     this.images = const [],
     required this.stockQuantity,
     required this.isActive,
+    this.hasSizes = false,
+    this.sizes,
+    this.sizeChartImage,
     required this.clickCount,
     required this.formattedPrice,
     required this.whatsappUrl,
@@ -54,6 +60,23 @@ class Product {
       }
     }
     
+    // Parse sizes map if available
+    Map<String, int>? sizesMap;
+    if (json['sizes'] != null) {
+      if (json['sizes'] is Map) {
+        sizesMap = Map<String, int>.from(json['sizes'].map((k, v) => MapEntry(k.toString(), _parseInt(v))));
+      } else if (json['sizes'] is String) {
+        try {
+          var decoded = jsonDecode(json['sizes']);
+          if (decoded is Map) {
+            sizesMap = Map<String, int>.from(decoded.map((k, v) => MapEntry(k.toString(), _parseInt(v))));
+          }
+        } catch (e) {
+          sizesMap = null;
+        }
+      }
+    }
+    
     // If no images array but has single image, add it to images list
     if (imagesList.isEmpty && json['image'] != null) {
       imagesList = [json['image']];
@@ -70,6 +93,9 @@ class Product {
       images: imagesList,
       stockQuantity: _parseInt(json['stock_quantity'] ?? 0),
       isActive: json['is_active'] == 1 || json['is_active'] == true,
+      hasSizes: json['has_sizes'] == 1 || json['has_sizes'] == true,
+      sizes: sizesMap,
+      sizeChartImage: json['size_chart_image']?.toString(),
       clickCount: _parseInt(json['click_count'] ?? 0),
       formattedPrice: json['formatted_price']?.toString() ?? '₹${_parseDouble(json['price'])}',
       whatsappUrl: json['whatsapp_url']?.toString() ?? '',
@@ -108,6 +134,9 @@ class Product {
       'images': images,
       'stock_quantity': stockQuantity,
       'is_active': isActive,
+      'has_sizes': hasSizes,
+      'sizes': sizes,
+      'size_chart_image': sizeChartImage,
       'click_count': clickCount,
       'formatted_price': formattedPrice,
       'whatsapp_url': whatsappUrl,
@@ -127,6 +156,9 @@ class Product {
     List<String>? images,
     int? stockQuantity,
     bool? isActive,
+    bool? hasSizes,
+    Map<String, int>? sizes,
+    String? sizeChartImage,
     int? clickCount,
     String? formattedPrice,
     String? whatsappUrl,
@@ -144,6 +176,9 @@ class Product {
       images: images ?? this.images,
       stockQuantity: stockQuantity ?? this.stockQuantity,
       isActive: isActive ?? this.isActive,
+      hasSizes: hasSizes ?? this.hasSizes,
+      sizes: sizes ?? this.sizes,
+      sizeChartImage: sizeChartImage ?? this.sizeChartImage,
       clickCount: clickCount ?? this.clickCount,
       formattedPrice: formattedPrice ?? this.formattedPrice,
       whatsappUrl: whatsappUrl ?? this.whatsappUrl,

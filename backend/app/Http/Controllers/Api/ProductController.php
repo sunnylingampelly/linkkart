@@ -43,6 +43,9 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'stock_quantity' => 'nullable|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'has_sizes' => 'nullable|boolean',
+            'sizes' => 'nullable|json',
+            'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -54,6 +57,19 @@ class ProductController extends Controller
 
         $data = $validator->validated();
         
+        // Check product limit based on subscription plan
+        $store = Store::findOrFail($data['store_id']);
+        $plan = $store->current_plan;
+        
+        if ($plan && $store->products()->count() >= $plan->product_limit) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product limit reached for your current plan (' . $plan->name . '). Please upgrade to add more products.',
+                'limit_reached' => true,
+                'current_limit' => $plan->product_limit
+            ], 403);
+        }
+
         // Set default stock quantity if not provided
         if (!isset($data['stock_quantity'])) {
             $data['stock_quantity'] = 0;
@@ -64,6 +80,18 @@ class ProductController extends Controller
             $image = $request->file('image');
             $imagePath = $image->store('products', 'public');
             $data['image'] = Storage::url($imagePath);
+        }
+
+        // Handle size chart image upload
+        if ($request->hasFile('size_chart_image')) {
+            $image = $request->file('size_chart_image');
+            $imagePath = $image->store('products/charts', 'public');
+            $data['size_chart_image'] = Storage::url($imagePath);
+        }
+
+        // Decode sizes if it's a string
+        if (isset($data['sizes']) && is_string($data['sizes'])) {
+            $data['sizes'] = json_decode($data['sizes'], true);
         }
 
         $product = Product::create($data);
@@ -97,6 +125,10 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'sometimes|boolean',
+            'has_sizes' => 'nullable|boolean',
+            'sizes' => 'nullable|json',
+            'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'stock_quantity' => 'nullable|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -119,6 +151,24 @@ class ProductController extends Controller
             $image = $request->file('image');
             $imagePath = $image->store('products', 'public');
             $data['image'] = Storage::url($imagePath);
+        }
+
+        // Handle size chart image upload
+        if ($request->hasFile('size_chart_image')) {
+            // Delete old size chart image
+            if ($product->size_chart_image) {
+                $oldPath = str_replace('/storage/', '', $product->size_chart_image);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $image = $request->file('size_chart_image');
+            $imagePath = $image->store('products/charts', 'public');
+            $data['size_chart_image'] = Storage::url($imagePath);
+        }
+
+        // Decode sizes if it's a string
+        if (isset($data['sizes']) && is_string($data['sizes'])) {
+            $data['sizes'] = json_decode($data['sizes'], true);
         }
 
         $product->update($data);

@@ -1,0 +1,19 @@
+========================================
+PAYMENT FIX - RUN THESE 2 COMMANDS
+========================================
+
+Copy and paste these commands ONE BY ONE into your MySQL console:
+
+-- Command 1: Fix data type
+ALTER TABLE stores MODIFY COLUMN subscription_id INT NULL;
+
+-- Command 2: Add foreign key
+ALTER TABLE stores ADD CONSTRAINT fk_stores_subscription FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE SET NULL;
+
+========================================
+DONE! Now test payment in mobile app.
+========================================
+
+If you get "Duplicate foreign key" error on Command 2, it means it already exists - that's fine, skip it.
+
+After running these, the DATABASE_ERROR should be fixed.

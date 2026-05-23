@@ -15,7 +15,9 @@ function ProductPage() {
   const [error, setError] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
 
   useEffect(() => {
     fetchProductData();
@@ -100,12 +102,23 @@ function ProductPage() {
   };
 
   const handleWhatsAppClick = () => {
+    if (product.has_sizes && !selectedSize) {
+      // Create a more elegant notification instead of alert
+      const sizeSelector = document.querySelector('.size-section');
+      if (sizeSelector) {
+        sizeSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        sizeSelector.classList.add('shake-animation');
+        setTimeout(() => sizeSelector.classList.remove('shake-animation'), 500);
+      }
+      return;
+    }
     trackEvent('product_click', product.id);
     setIsDrawerOpen(true);
   };
 
   const incrementQuantity = () => {
-    if (product.stock_quantity && quantity >= product.stock_quantity) return;
+    const maxStock = selectedSize ? product.sizes[selectedSize] : product.stock_quantity;
+    if (maxStock && quantity >= maxStock) return;
     setQuantity(prev => prev + 1);
   };
 
@@ -287,6 +300,37 @@ function ProductPage() {
                 </div>
               </div>
 
+              {product.has_sizes && product.sizes && (
+                <div className="size-section">
+                  <div className="size-header">
+                    <label className="size-label">Select Size</label>
+                    {product.size_chart_image && (
+                      <button 
+                        className="size-chart-link"
+                        onClick={() => setIsSizeChartOpen(true)}
+                      >
+                        Size Guide
+                      </button>
+                    )}
+                  </div>
+                  <div className="size-selector">
+                    {Object.entries(product.sizes).map(([size, stock]) => (
+                      <button
+                        key={size}
+                        className={`size-btn ${selectedSize === size ? 'active' : ''} ${stock === 0 ? 'out-of-stock' : ''}`}
+                        onClick={() => stock > 0 && setSelectedSize(size)}
+                        disabled={stock === 0}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedSize && product.sizes[selectedSize] < 10 && product.sizes[selectedSize] > 0 && (
+                    <p className="low-stock-warning">Only {product.sizes[selectedSize]} left in this size!</p>
+                  )}
+                </div>
+              )}
+
               <div className="quantity-section">
                 <label className="quantity-label">Select Quantity</label>
                 <div className="quantity-selector">
@@ -361,8 +405,24 @@ function ProductPage() {
           product={product}
           store={store}
           quantity={quantity}
+          selectedSize={selectedSize}
           total={product.price * quantity}
         />
+      )}
+
+      {isSizeChartOpen && (
+        <div className="size-chart-modal" onClick={() => setIsSizeChartOpen(false)}>
+          <div className="size-chart-content" onClick={e => e.stopPropagation()}>
+            <button className="close-modal" onClick={() => setIsSizeChartOpen(false)}>×</button>
+            <h3>Size Guide</h3>
+            <div className="size-chart-image-container">
+              <img 
+                src={product.size_chart_image.startsWith('http') ? product.size_chart_image : `${API_BASE_URL}${product.size_chart_image}`} 
+                alt="Size Chart" 
+              />
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

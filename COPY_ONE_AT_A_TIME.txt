@@ -1,0 +1,47 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    PAYMENT FIX - COPY ONE AT A TIME                        ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+⚠️  IMPORTANT: Do NOT copy multiple lines. Copy ONE command, press Enter, wait.
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ COMMAND 1: Fix the data type                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+ALTER TABLE stores MODIFY COLUMN subscription_id INT NULL;
+
+✓ Expected: Query OK, 0 rows affected
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ COMMAND 2: Add foreign key                                                │
+└────────────────────────────────────────────────────────────────────────────┘
+
+ALTER TABLE stores ADD CONSTRAINT fk_stores_subscription FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE SET NULL;
+
+✓ Expected: Query OK, 0 rows affected
+✓ OR: Duplicate foreign key (this is also OK - means it exists)
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ COMMAND 3: Verify                                                          │
+└────────────────────────────────────────────────────────────────────────────┘
+
+DESCRIBE stores;
+
+✓ Look for: subscription_id | int | YES
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                              THAT'S IT!                                    ║
+║                   Now test payment in mobile app                           ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+TROUBLESHOOTING:
+If Command 2 still fails with "incompatible" error, run this diagnostic:
+
+SELECT COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'stores' AND COLUMN_NAME = 'subscription_id';
+
+Then send me the result.

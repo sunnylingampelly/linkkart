@@ -165,6 +165,9 @@ class ApiService {
     String? description,
     int? stockQuantity,
     File? image,
+    bool hasSizes = false,
+    Map<String, int>? sizes,
+    File? sizeChartImage,
   }) async {
     var request = http.MultipartRequest(
       'POST',
@@ -176,10 +179,21 @@ class ApiService {
     request.fields['price'] = price.toString();
     if (description != null) request.fields['description'] = description;
     if (stockQuantity != null) request.fields['stock_quantity'] = stockQuantity.toString();
+    
+    request.fields['has_sizes'] = hasSizes ? '1' : '0';
+    if (sizes != null) {
+      request.fields['sizes'] = json.encode(sizes);
+    }
 
     if (image != null) {
       request.files.add(
         await http.MultipartFile.fromPath('image', image.path),
+      );
+    }
+
+    if (sizeChartImage != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath('size_chart_image', sizeChartImage.path),
       );
     }
 
@@ -235,6 +249,10 @@ class ApiService {
     double? price,
     String? description,
     File? image,
+    bool? hasSizes,
+    Map<String, int>? sizes,
+    File? sizeChartImage,
+    int? stockQuantity,
   }) async {
     var request = http.MultipartRequest(
       'POST',
@@ -244,10 +262,20 @@ class ApiService {
     if (name != null) request.fields['name'] = name;
     if (price != null) request.fields['price'] = price.toString();
     if (description != null) request.fields['description'] = description;
+    if (stockQuantity != null) request.fields['stock_quantity'] = stockQuantity.toString();
+
+    if (hasSizes != null) request.fields['has_sizes'] = hasSizes ? '1' : '0';
+    if (sizes != null) request.fields['sizes'] = json.encode(sizes);
 
     if (image != null) {
       request.files.add(
         await http.MultipartFile.fromPath('image', image.path),
+      );
+    }
+
+    if (sizeChartImage != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath('size_chart_image', sizeChartImage.path),
       );
     }
 
@@ -330,7 +358,7 @@ class ApiService {
   // Payment & Subscription APIs
   Future<List<Plan>> getPlans() async {
     final response = await http.get(
-      Uri.parse('$baseUrl/plans'),
+      Uri.parse('$baseUrl/api/v1/plans'),
     );
 
     var data = _handleResponse(response);
@@ -343,7 +371,7 @@ class ApiService {
     int planId,
   ) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/subscriptions'),
+      Uri.parse('$baseUrl/api/v1/seller/subscriptions'),
       headers: await _authHeaders(),
       body: json.encode({
         'store_id': storeId,
@@ -357,7 +385,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> getSubscription(int subscriptionId) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/subscriptions/$subscriptionId'),
+      Uri.parse('$baseUrl/api/v1/seller/subscriptions/$subscriptionId'),
       headers: await _authHeaders(),
     );
 
@@ -370,7 +398,7 @@ class ApiService {
     double amount,
   ) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/payments/create-order'),
+      Uri.parse('$baseUrl/api/v1/seller/payments/create-order'),
       headers: await _authHeaders(),
       body: json.encode({
         'subscription_id': subscriptionId,
@@ -388,7 +416,7 @@ class ApiService {
     String signature,
   ) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/payments/verify'),
+      Uri.parse('$baseUrl/api/v1/seller/payments/verify'),
       headers: await _authHeaders(),
       body: json.encode({
         'razorpay_order_id': orderId,

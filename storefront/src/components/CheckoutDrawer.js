@@ -3,7 +3,7 @@ import './CheckoutDrawer.css';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config';
 
-function CheckoutDrawer({ isOpen, onClose, product, store, quantity, total }) {
+function CheckoutDrawer({ isOpen, onClose, product, store, quantity, selectedSize, total }) {
   const [formData, setFormData] = useState({
     name: '',
     phone: '+91 ',
@@ -67,6 +67,7 @@ function CheckoutDrawer({ isOpen, onClose, product, store, quantity, total }) {
             name: formData.name,
             phone: formData.phone,
             quantity: quantity,
+            size: selectedSize,
             total_price: total
           });
           if (res.data.success) {
@@ -89,6 +90,7 @@ function CheckoutDrawer({ isOpen, onClose, product, store, quantity, total }) {
         `━━━━━━━━━━━━━━━\n\n` +
         `🛍️ *Product Details*\n` +
         `*Name:* ${product.name}\n` +
+        (selectedSize ? `*Size:* ${selectedSize}\n` : '') +
         `*Link:* ${productLink}\n` +
         `*Quantity:* ${quantity}\n` +
         `*Total Price:* ₹${total.toLocaleString('en-IN')}\n\n` +
@@ -129,7 +131,7 @@ function CheckoutDrawer({ isOpen, onClose, product, store, quantity, total }) {
         <div className="order-summary-mini">
           <div className="mini-product-info">
             <span className="mini-qty">{quantity}x</span>
-            <span className="mini-name">{product.name}</span>
+            <span className="mini-name">{product.name} {selectedSize && `(${selectedSize})`}</span>
           </div>
           <span className="mini-total">₹{total.toLocaleString('en-IN')}</span>
         </div>

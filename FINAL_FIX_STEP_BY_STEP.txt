@@ -1,0 +1,41 @@
+================================================================================
+PAYMENT FIX - COPY ONE COMMAND AT A TIME
+================================================================================
+
+IMPORTANT: Copy ONLY ONE command at a time, press Enter, wait for result, then next.
+
+--------------------------------------------------------------------------------
+COMMAND 1: Check current data types
+--------------------------------------------------------------------------------
+DESCRIBE stores;
+
+(Look for subscription_id column and its type)
+
+--------------------------------------------------------------------------------
+COMMAND 2: Fix the data type mismatch
+--------------------------------------------------------------------------------
+ALTER TABLE stores MODIFY COLUMN subscription_id INT NULL;
+
+(Should say: Query OK)
+
+--------------------------------------------------------------------------------
+COMMAND 3: Add the foreign key constraint
+--------------------------------------------------------------------------------
+ALTER TABLE stores ADD CONSTRAINT fk_stores_subscription FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE SET NULL;
+
+(Should say: Query OK, or "Duplicate foreign key" which is fine)
+
+--------------------------------------------------------------------------------
+COMMAND 4: Verify it worked
+--------------------------------------------------------------------------------
+SHOW CREATE TABLE stores;
+
+(Look for CONSTRAINT `fk_stores_subscription` in the output)
+
+================================================================================
+DONE! Now test payment in mobile app.
+================================================================================
+
+If Command 3 gives "Duplicate foreign key" error, that's OK - it means it already exists.
+
+The key fix is Command 2 - changing subscription_id from BIGINT to INT.

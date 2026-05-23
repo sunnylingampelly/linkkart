@@ -21,14 +21,19 @@ class Product extends Model
         'stock_quantity',
         'is_active',
         'click_count',
+        'sizes',
+        'has_sizes',
+        'size_chart_image',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'is_active' => 'boolean',
+        'has_sizes' => 'boolean',
         'click_count' => 'integer',
         'stock_quantity' => 'integer',
         'images' => 'array', // Cast JSON to array
+        'sizes' => 'array', // Cast JSON to array
     ];
 
     protected $appends = ['formatted_price', 'whatsapp_url'];
@@ -58,6 +63,18 @@ class Product extends Model
                 }
                 
                 $product->product_id = 'LK-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
+            }
+
+            // Sync stock quantity with sizes if applicable
+            if ($product->has_sizes && is_array($product->sizes)) {
+                $product->stock_quantity = array_sum($product->sizes);
+            }
+        });
+
+        static::updating(function ($product) {
+            // Sync stock quantity with sizes if applicable
+            if ($product->has_sizes && is_array($product->sizes)) {
+                $product->stock_quantity = array_sum($product->sizes);
             }
         });
     }

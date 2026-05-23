@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:linkkart/utils/app_colors.dart';
 import 'package:linkkart/providers/product_provider.dart';
 import 'package:linkkart/providers/store_provider.dart';
+import 'package:linkkart/screens/pricing_screen.dart';
 
 class AddProductScreenPremium extends StatefulWidget {
   const AddProductScreenPremium({Key? key}) : super(key: key);
@@ -22,6 +23,17 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
   final _descriptionController = TextEditingController();
   final _stockController = TextEditingController();
   
+  bool _hasSizes = false;
+  final Map<String, int> _sizes = {
+    'S': 0,
+    'M': 0,
+    'L': 0,
+    'XL': 0,
+    'XXL': 0,
+    'XXXL': 0,
+  };
+  File? _sizeChartImage;
+
   final List<File?> _images = [null, null, null, null, null]; // 5 images
   final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
@@ -84,6 +96,31 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to pick image: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _pickSizeChartImage() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          _sizeChartImage = File(pickedFile.path);
+        });
+        HapticFeedback.lightImpact();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to pick size chart: ${e.toString()}'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -255,9 +292,16 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
         description: _descriptionController.text.trim(),
         stockQuantity: int.parse(_stockController.text.trim()),
         image: primaryImage,
+        hasSizes: _hasSizes,
+        sizes: _hasSizes ? _sizes : null,
+        sizeChartImage: _sizeChartImage,
       );
 
       if (!success) {
+        if (productProvider.error?.startsWith('LIMIT_REACHED') == true) {
+          _showLimitReachedDialog(productProvider.error!.replaceFirst('LIMIT_REACHED: ', ''));
+          return;
+        }
         throw Exception(productProvider.error ?? 'Failed to add product');
       }
 
@@ -350,6 +394,52 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _showLimitReachedDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+        title: Column(
+          children: [
+            Icon(Icons.lock_clock_rounded, size: 48, color: AppColors.primary),
+            const SizedBox(height: 16),
+            Text(
+              'Limit Reached',
+              style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.inter(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Later', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PricingScreen()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+            ),
+            child: const Text('Upgrade Now'),
+          ),
+        ],
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
+        actionsPadding: const EdgeInsets.only(bottom: 20, left: 10, right: 10),
+      ),
+    );
   }
 
   @override
@@ -503,9 +593,171 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
                         ],
                       ),
 
-                      SizedBox(height: 16),
+                      SizedBox(height: 32),
 
-                      // Description
+                      // Sizes Section
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'PRODUCT SIZES',
+                                      style: GoogleFonts.playfairDisplay(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.textPrimary,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Enable sizes for this product',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Switch.adaptive(
+                                  value: _hasSizes,
+                                  activeColor: AppColors.primary,
+                                  onChanged: (value) {
+                                    setState(() => _hasSizes = value);
+                                  },
+                                ),
+                              ],
+                            ),
+                            if (_hasSizes) ...[
+                              SizedBox(height: 24),
+                              Text(
+                                'Available Sizes & Quantities',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Wrap(
+                                spacing: 12,
+                                runSpacing: 16,
+                                children: _sizes.keys.map((size) {
+                                  return Container(
+                                    width: (MediaQuery.of(context).size.width - 88) / 3,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          size,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        ),
+                                        SizedBox(height: 8),
+                                        TextFormField(
+                                          initialValue: _sizes[size].toString(),
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(
+                                            hintText: '0',
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                            filled: true,
+                                            fillColor: AppColors.background,
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                                              borderSide: BorderSide(color: AppColors.border),
+                                            ),
+                                          ),
+                                          onChanged: (value) {
+                                            _sizes[size] = int.tryParse(value) ?? 0;
+                                            // Update total stock
+                                            int total = 0;
+                                            _sizes.values.forEach((v) => total += v);
+                                            _stockController.text = total.toString();
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              SizedBox(height: 24),
+                              Divider(color: AppColors.border),
+                              SizedBox(height: 16),
+                              Text(
+                                'Size Chart',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              SizedBox(height: 12),
+                              GestureDetector(
+                                onTap: () => _pickSizeChartImage(),
+                                child: Container(
+                                  height: 120,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.background,
+                                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                                    border: Border.all(color: AppColors.border, style: BorderStyle.solid),
+                                  ),
+                                  child: _sizeChartImage != null
+                                      ? Stack(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                                              child: Image.file(_sizeChartImage!, width: double.infinity, height: 120, fit: BoxFit.cover),
+                                            ),
+                                            Positioned(
+                                              top: 8,
+                                              right: 8,
+                                              child: GestureDetector(
+                                                onTap: () => setState(() => _sizeChartImage = null),
+                                                child: Container(
+                                                  padding: EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                                                  child: Icon(Icons.close, color: Colors.white, size: 16),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.add_photo_alternate_outlined, color: AppColors.primary, size: 32),
+                                            SizedBox(height: 8),
+                                            Text(
+                                              'Upload Size Chart',
+                                              style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                                            ),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 32),
+
+                      // Description Section
                       _buildTextField(
                         controller: _descriptionController,
                         label: 'Description',

@@ -18,14 +18,16 @@ class Store extends Model
         'slug',
         'is_active',
         'view_count',
+        'subscription_id',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'view_count' => 'integer',
+        'subscription_id' => 'integer',
     ];
 
-    protected $appends = ['store_url', 'product_count'];
+    protected $appends = ['store_url', 'product_count', 'current_plan'];
 
     /**
      * Boot the model.
@@ -47,6 +49,27 @@ class Store extends Model
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Get the current subscription.
+     */
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class, 'subscription_id');
+    }
+
+    /**
+     * Get the current plan attribute.
+     */
+    public function getCurrentPlanAttribute()
+    {
+        if ($this->subscription && $this->subscription->plan) {
+            return $this->subscription->plan;
+        }
+
+        // Default to free plan if no subscription
+        return Plan::where('slug', 'free')->first();
     }
 
     /**

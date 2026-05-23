@@ -37,6 +37,9 @@ class ProductProvider with ChangeNotifier {
     String? description,
     int? stockQuantity,
     File? image,
+    bool hasSizes = false,
+    Map<String, int>? sizes,
+    File? sizeChartImage,
   }) async {
     _isLoading = true;
     _error = null;
@@ -50,6 +53,9 @@ class ProductProvider with ChangeNotifier {
         description: description,
         stockQuantity: stockQuantity,
         image: image,
+        hasSizes: hasSizes,
+        sizes: sizes,
+        sizeChartImage: sizeChartImage,
       );
 
       _products.insert(0, product);
@@ -57,7 +63,11 @@ class ProductProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = e.toString().replaceAll('Exception: ', '');
+      // Check if it's a limit reached error
+      if (_error!.contains('limit reached') || _error!.contains('upgrade')) {
+        _error = 'LIMIT_REACHED: $_error';
+      }
       _isLoading = false;
       notifyListeners();
       return false;
@@ -70,6 +80,10 @@ class ProductProvider with ChangeNotifier {
     double? price,
     String? description,
     File? image,
+    bool? hasSizes,
+    Map<String, int>? sizes,
+    File? sizeChartImage,
+    int? stockQuantity,
   }) async {
     _isLoading = true;
     _error = null;
@@ -82,6 +96,10 @@ class ProductProvider with ChangeNotifier {
         price: price,
         description: description,
         image: image,
+        hasSizes: hasSizes,
+        sizes: sizes,
+        sizeChartImage: sizeChartImage,
+        stockQuantity: stockQuantity,
       );
 
       final index = _products.indexWhere((p) => p.id == productId);
