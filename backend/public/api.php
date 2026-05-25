@@ -907,6 +907,9 @@ if (preg_match('#^/api/v1/stores/([^/]+)$#', $uri, $matches) && $method === 'GET
                 image,
                 images,
                 stock_quantity,
+                sizes,
+                has_sizes,
+                size_chart_image,
                 is_active,
                 click_count,
                 created_at,
@@ -919,6 +922,23 @@ if (preg_match('#^/api/v1/stores/([^/]+)$#', $uri, $matches) && $method === 'GET
         ");
         $stmt->execute([$store['id']]);
         $products = $stmt->fetchAll();
+        
+        // Parse JSON fields for each product
+        foreach ($products as &$product) {
+            // Parse sizes JSON
+            if (!empty($product['sizes'])) {
+                $product['sizes'] = json_decode($product['sizes'], true);
+            }
+            // Parse images JSON
+            if (!empty($product['images'])) {
+                $decoded = json_decode($product['images'], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $product['images'] = $decoded;
+                }
+            }
+            // Convert has_sizes to boolean
+            $product['has_sizes'] = (bool)$product['has_sizes'];
+        }
         
         // Add computed fields
         $store['store_url'] = 'https://linkkart.shop/store/' . $store['slug'];

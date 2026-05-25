@@ -423,10 +423,15 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
           ),
           ElevatedButton(
             onPressed: () {
+              final storeProvider = Provider.of<StoreProvider>(context, listen: false);
+              final storeId = storeProvider.currentStore?.id ?? 0;
+              
               Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const PricingScreen()),
+                MaterialPageRoute(
+                  builder: (context) => PricingScreen(storeId: storeId),
+                ),
               );
             },
             style: ElevatedButton.styleFrom(

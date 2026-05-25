@@ -210,39 +210,177 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(24),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 20),
+                SizedBox(height: 40),
+                
+                // Logo
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                    border: Border.all(color: AppColors.border),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Image.asset(
+                      'assets/images/lk_luxury_monogram_only.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                
+                SizedBox(height: 48),
                 
                 // Title
                 Text(
-                  'LOGIN',
+                  'WELCOME BACK',
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
                     letterSpacing: 4,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 
                 SizedBox(height: 12),
                 
                 Text(
-                  'Enter your phone number to start',
+                  'Sign in to continue to your store',
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     color: AppColors.textSecondary,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 
-                SizedBox(height: 48),
+                SizedBox(height: 64),
+
+                // Google Sign In Button (Centered)
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: OutlinedButton.icon(
+                    onPressed: _isLoading ? null : _signInWithGoogle,
+                    icon: _isLoading
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                            ),
+                          )
+                        : FaIcon(
+                            FontAwesomeIcons.google,
+                            size: 20,
+                            color: AppColors.textPrimary,
+                          ),
+                    label: Text(
+                      _isLoading ? 'Signing in...' : 'Sign in with Google',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: AppColors.border, width: 1.5),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ),
                 
-                // Phone Input
+                SizedBox(height: 32),
+                
+                // Info Text
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.info.withOpacity(0.1),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    border: Border.all(
+                      color: AppColors.info.withOpacity(0.2),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: AppColors.info,
+                        size: 20,
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Sign in securely with your Google account',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: AppColors.info,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                SizedBox(height: 40),
+                
+                /* PHONE OTP TEMPORARILY DISABLED
+                // Uncomment this section when phone OTP is working
+                
+                // Or Divider
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: AppColors.border)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'OR',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textTertiary,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: AppColors.border)),
+                  ],
+                ),
+
+                SizedBox(height: 32),
+                
+                // Phone Input Section
+                Text(
+                  'Sign in with Phone',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                
+                SizedBox(height: 16),
+                
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   decoration: BoxDecoration(
@@ -256,7 +394,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Country Code
                       Padding(
                         padding: const EdgeInsets.only(left: 16, right: 8),
                         child: Text(
@@ -268,13 +405,11 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           ),
                         ),
                       ),
-                      // Divider
                       Container(
                         height: 24,
                         width: 1,
                         color: AppColors.border,
                       ),
-                      // Phone Input
                       Expanded(
                         child: TextFormField(
                           controller: _phoneController,
@@ -295,24 +430,15 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                               color: AppColors.textSecondary.withOpacity(0.5),
                             ),
                             border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            focusedErrorBorder: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 18,
                             ),
-                            isDense: false,
                           ),
                           validator: (value) {
                             final v = (value ?? '').trim();
-                            if (v.isEmpty) {
-                              return 'Please enter your mobile number';
-                            }
-                            if (v.length != 10) {
-                              return 'Enter a valid 10-digit mobile number';
-                            }
+                            if (v.isEmpty) return 'Please enter your mobile number';
+                            if (v.length != 10) return 'Enter a valid 10-digit mobile number';
                             return null;
                           },
                         ),
@@ -321,42 +447,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   ),
                 ),
                 
-                SizedBox(height: 32),
+                SizedBox(height: 24),
                 
-                // Info Box
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.info.withOpacity(0.1),
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    border: Border.all(
-                      color: AppColors.info.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        color: AppColors.info,
-                        size: 20,
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'You\'ll receive a 6-digit verification code via SMS',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            color: AppColors.info,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                SizedBox(height: 48),
-                
-                // Continue Button
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -380,7 +472,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                             ),
                           )
                         : Text(
-                            'Continue',
+                            'Send OTP',
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -388,58 +480,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           ),
                   ),
                 ),
-
-                SizedBox(height: 32),
-
-                // Or Divider
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: AppColors.border)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'OR',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textTertiary,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: AppColors.border)),
-                  ],
-                ),
-
-                SizedBox(height: 32),
-
-                // Google Sign In Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: OutlinedButton.icon(
-                    onPressed: _isLoading ? null : _signInWithGoogle,
-                    icon: FaIcon(
-                      FontAwesomeIcons.google,
-                      size: 20,
-                      color: AppColors.textPrimary,
-                    ),
-                    label: Text(
-                      'Sign in with Google',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.border),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(12)),
-                      ),
-                    ),
-                  ),
-                ),
+                
+                */ // END PHONE OTP SECTION
               ],
             ),
           ),
