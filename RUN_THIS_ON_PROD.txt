@@ -1,0 +1,81 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    PRODUCTION DATABASE UPDATE                              ║
+║                    Sizes + Subscription System                             ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: BACKUP FIRST!                                                     │
+└────────────────────────────────────────────────────────────────────────────┘
+
+mysqldump -u linkkart -p linkkart > backup_$(date +%Y%m%d).sql
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: RUN THE UPDATE                                                    │
+└────────────────────────────────────────────────────────────────────────────┘
+
+Option A - Run complete file:
+mysql -u linkkart -p linkkart < PRODUCTION_UPDATE_COMPLETE.sql
+
+Option B - Manual (safer):
+mysql -u linkkart -p linkkart
+Then copy commands from PRODUCTION_UPDATE_COMPLETE.sql one by one
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: VERIFY                                                             │
+└────────────────────────────────────────────────────────────────────────────┘
+
+mysql -u linkkart -p linkkart
+
+-- Check products have size columns
+DESCRIBE products;
+
+-- Check subscription tables exist
+SHOW TABLES;
+
+-- Check plans inserted
+SELECT * FROM plans;
+
+-- Check stores have subscriptions
+SELECT s.id, s.name, p.name as plan 
+FROM stores s 
+JOIN subscriptions sub ON s.subscription_id = sub.id 
+JOIN plans p ON sub.plan_id = p.id;
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                              WHAT GETS ADDED                               ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+✓ Products: sizes, has_sizes, size_chart_image columns
+✓ Tables: plans, subscriptions, payments, invoices
+✓ Plans: Free (₹0), Starter (₹299), Business (₹599)
+✓ Stores: All assigned to Free plan automatically
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                              FILES TO USE                                  ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📄 PRODUCTION_UPDATE_COMPLETE.sql       ⭐ Main SQL file
+📄 RUN_ON_PRODUCTION_STEP_BY_STEP.md    ⭐ Detailed guide
+📄 PRODUCTION_UPDATE_SUMMARY.md         ⭐ Quick summary
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                           COMMON ERRORS (OK TO IGNORE)                     ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+"Duplicate column name"      → Column already exists, skip that command
+"Table already exists"        → Table already created, skip that command
+"Duplicate entry"             → Data already inserted, skip that command
+"Duplicate key name"          → Index already exists, skip that command
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                              NEED HELP?                                    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+Read: RUN_ON_PRODUCTION_STEP_BY_STEP.md for detailed instructions
+Or send me the error message and I'll help!

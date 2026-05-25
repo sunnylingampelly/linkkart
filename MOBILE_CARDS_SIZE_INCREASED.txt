@@ -1,0 +1,79 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║           MOBILE PRODUCT CARDS - SIZE INCREASED (2 COLUMNS)                ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ WHAT CHANGED                                                               │
+└────────────────────────────────────────────────────────────────────────────┘
+
+✅ Still 2 columns (as requested)
+✅ Increased card size
+✅ Taller images (3:4 aspect ratio instead of 1:1)
+✅ Larger text
+✅ More spacing
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ SIZE COMPARISON                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+                    BEFORE          AFTER           CHANGE
+Gap:                16px            20px            +25%
+Image Ratio:        1:1 (square)    3:4 (taller)    +33% height
+Padding:            16px/12px       20px/16px       +25%
+Product Name:       14px            16px            +14%
+Price:              16px            20px            +25%
+Description:        10px            11px            +10%
+Quick View:         48px            52px            +8%
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ VISUAL LAYOUT                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+MOBILE (2 columns):
+
+┌──────────────┬──────────────┐
+│              │              │
+│  [BIGGER]    │  [BIGGER]    │  ← Taller images (3:4)
+│   IMAGE      │   IMAGE      │
+│              │              │
+│              │              │
+│ Product Name │ Product Name │  ← Larger text (16px)
+│ Description  │ Description  │
+│    ₹299      │    ₹299      │  ← Larger price (20px)
+└──────────────┴──────────────┘
+       ↑              ↑
+    20px gap      20px gap
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ KEY IMPROVEMENTS                                                           │
+└────────────────────────────────────────────────────────────────────────────┘
+
+✅ Taller product images (3:4 ratio) - Better for showing products
+✅ More gap between cards (20px vs 16px) - Less cramped
+✅ Larger text throughout - Better readability
+✅ More padding inside cards - More breathing room
+✅ Larger quick view button - Easier to tap
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ FILE CHANGED                                                               │
+└────────────────────────────────────────────────────────────────────────────┘
+
+📄 storefront/src/pages/StorePage.css
+
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ DEPLOY                                                                     │
+└────────────────────────────────────────────────────────────────────────────┘
+
+cd storefront
+npm run build
+# Deploy to production
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║  Cards are now bigger while keeping 2 columns layout! ✅                  ║
+╚════════════════════════════════════════════════════════════════════════════╝

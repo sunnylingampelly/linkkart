@@ -385,7 +385,7 @@
     font-size: 10px;
   }
   .products-container {
-    padding: 32px 16px;
+    padding: 32px 12px;
   }
   .section-header {
     margin-bottom: 32px;
@@ -394,27 +394,58 @@
     font-size: 32px;
     letter-spacing: -1px;
   }
+  
+  /* LARGER PRODUCT CARDS - 2 COLUMNS */
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 20px; /* Increased from 16px */
   }
+  
+  /* Taller product image */
+  .product-image {
+    aspect-ratio: 3/4; /* Taller than 1:1, better for products */
+  }
+  
+  /* More spacious product details */
   .product-details {
-    padding: 16px 12px;
-    gap: 8px;
+    padding: 20px 16px; /* Increased from 16px 12px */
+    gap: 10px; /* Increased from 8px */
   }
+  
+  /* Larger text */
   .product-name {
-    font-size: 14px;
+    font-size: 16px; /* Increased from 14px */
+    letter-spacing: -0.3px;
   }
+  
   .product-price {
-    font-size: 16px;
+    font-size: 20px; /* Increased from 16px */
   }
+  
   .product-description {
-    font-size: 10px;
-    line-height: 1.4;
+    font-size: 11px; /* Increased from 10px */
+    line-height: 1.5;
+    -webkit-line-clamp: 2;
   }
+  
   .view-details {
     font-size: 9px;
+    letter-spacing: 2px;
   }
+  
+  /* Larger quick view button */
+  .quick-view {
+    width: 52px; /* Increased from 48px */
+    height: 52px;
+    bottom: 16px;
+    right: 16px;
+  }
+  
+  .quick-view svg {
+    width: 22px;
+    height: 22px;
+  }
+  
   .store-footer {
     padding: 64px 24px;
   }
