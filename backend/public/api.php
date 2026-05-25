@@ -1613,11 +1613,43 @@ if (($uri === '/api/v1/products' || $uri === '/api/v1/seller/products') && $meth
         // Generate product_id
         $productId = 'PRD' . time() . rand(1000, 9999);
         
+        // Handle sizes
+        $hasSizes = isset($data['has_sizes']) && ($data['has_sizes'] === '1' || $data['has_sizes'] === 1 || $data['has_sizes'] === true);
+        $sizes = null;
+        $sizeChartImage = null;
+        $stockQuantity = 0;
+        
+        if ($hasSizes && isset($data['sizes'])) {
+            // Sizes is already JSON string from mobile app
+            $sizes = is_string($data['sizes']) ? $data['sizes'] : json_encode($data['sizes']);
+            
+            // Calculate total stock from sizes
+            $sizesArray = json_decode($sizes, true);
+            if (is_array($sizesArray)) {
+                $stockQuantity = array_sum($sizesArray);
+            }
+            
+            // Handle size chart image upload
+            if (isset($_FILES['size_chart_image']) && $_FILES['size_chart_image']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = __DIR__ . '/storage/products/';
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+                $extension = pathinfo($_FILES['size_chart_image']['name'], PATHINFO_EXTENSION);
+                $filename = 'size_chart_' . uniqid() . '.' . $extension;
+                $filepath = $uploadDir . $filename;
+                if (move_uploaded_file($_FILES['size_chart_image']['tmp_name'], $filepath)) {
+                    $sizeChartImage = '/storage/products/' . $filename;
+                }
+            }
+        } else {
+            // No sizes, use provided stock quantity
+            $stockQuantity = $data['stock_quantity'] ?? 0;
+        }
+        
         // Insert product
         $stmt = $pdo->prepare("
             INSERT INTO products 
-            (store_id, product_id, name, price, description, image, images, stock_quantity, is_active, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
+            (store_id, product_id, name, price, description, image, images, stock_quantity, has_sizes, sizes, size_chart_image, is_active, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
         ");
         
         $stmt->execute([
@@ -1628,7 +1660,10 @@ if (($uri === '/api/v1/products' || $uri === '/api/v1/seller/products') && $meth
             $data['description'] ?? null,
             $data['image'] ?? null,
             isset($data['images']) ? json_encode($data['images']) : null,
-            $data['stock_quantity'] ?? 0
+            $stockQuantity,
+            $hasSizes ? 1 : 0,
+            $sizes,
+            $sizeChartImage
         ]);
         
         $id = $pdo->lastInsertId();
@@ -1637,6 +1672,12 @@ if (($uri === '/api/v1/products' || $uri === '/api/v1/seller/products') && $meth
         $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
         $stmt->execute([$id]);
         $product = $stmt->fetch();
+        
+        // Parse sizes if present
+        $productSizes = null;
+        if (!empty($product['sizes'])) {
+            $productSizes = json_decode($product['sizes'], true);
+        }
         
         sendJson([
             'success' => true,
@@ -1651,6 +1692,9 @@ if (($uri === '/api/v1/products' || $uri === '/api/v1/seller/products') && $meth
                 'image' => $product['image'],
                 'images' => $product['images'],
                 'stock_quantity' => (int)$product['stock_quantity'],
+                'has_sizes' => (bool)$product['has_sizes'],
+                'sizes' => $productSizes,
+                'size_chart_image' => $product['size_chart_image'],
                 'is_active' => (int)$product['is_active'],
                 'click_count' => (int)$product['click_count'],
                 'created_at' => $product['created_at'],
@@ -1686,6 +1730,16 @@ if ((preg_match('#^/api/v1/products/(\d+)$#', $uri, $matches) && ($method === 'P
             $filename = uniqid() . '.' . $ext;
             if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $filename)) {
                 $data['image'] = '/storage/products/' . $filename;
+            }
+        }
+        // Handle size chart image upload
+        if (isset($_FILES['size_chart_image']) && $_FILES['size_chart_image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/storage/products/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            $ext = pathinfo($_FILES['size_chart_image']['name'], PATHINFO_EXTENSION);
+            $filename = 'size_chart_' . uniqid() . '.' . $ext;
+            if (move_uploaded_file($_FILES['size_chart_image']['tmp_name'], $uploadDir . $filename)) {
+                $data['size_chart_image'] = '/storage/products/' . $filename;
             }
         }
     } else {
@@ -1742,10 +1796,45 @@ if ((preg_match('#^/api/v1/products/(\d+)$#', $uri, $matches) && ($method === 'P
             $updates[] = "images = ?";
             $params[] = json_encode($data['images']);
         }
-        if (isset($data['stock_quantity'])) {
+        
+        // Handle sizes
+        if (isset($data['has_sizes'])) {
+            $hasSizes = $data['has_sizes'] === '1' || $data['has_sizes'] === 1 || $data['has_sizes'] === true;
+            $updates[] = "has_sizes = ?";
+            $params[] = $hasSizes ? 1 : 0;
+            
+            if ($hasSizes && isset($data['sizes'])) {
+                // Sizes is already JSON string from mobile app
+                $sizes = is_string($data['sizes']) ? $data['sizes'] : json_encode($data['sizes']);
+                $updates[] = "sizes = ?";
+                $params[] = $sizes;
+                
+                // Calculate total stock from sizes
+                $sizesArray = json_decode($sizes, true);
+                if (is_array($sizesArray)) {
+                    $stockQuantity = array_sum($sizesArray);
+                    $updates[] = "stock_quantity = ?";
+                    $params[] = $stockQuantity;
+                }
+            } else {
+                // Clear sizes if has_sizes is false
+                $updates[] = "sizes = NULL";
+                $updates[] = "size_chart_image = NULL";
+            }
+        }
+        
+        // Handle size chart image
+        if (isset($data['size_chart_image'])) {
+            $updates[] = "size_chart_image = ?";
+            $params[] = $data['size_chart_image'];
+        }
+        
+        // Handle stock quantity (only if sizes not enabled)
+        if (isset($data['stock_quantity']) && (!isset($data['has_sizes']) || !$data['has_sizes'])) {
             $updates[] = "stock_quantity = ?";
             $params[] = $data['stock_quantity'];
         }
+        
         if (isset($data['is_active'])) {
             $updates[] = "is_active = ?";
             $params[] = $data['is_active'] ? 1 : 0;
@@ -1765,9 +1854,38 @@ if ((preg_match('#^/api/v1/products/(\d+)$#', $uri, $matches) && ($method === 'P
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         
+        // Get the updated product data
+        $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
+        $stmt->execute([$productId]);
+        $product = $stmt->fetch();
+        
+        // Parse sizes if present
+        $productSizes = null;
+        if (!empty($product['sizes'])) {
+            $productSizes = json_decode($product['sizes'], true);
+        }
+        
         sendJson([
             'success' => true,
-            'message' => 'Product updated successfully'
+            'message' => 'Product updated successfully',
+            'data' => [
+                'id' => (int)$product['id'],
+                'store_id' => (int)$product['store_id'],
+                'product_id' => $product['product_id'],
+                'name' => $product['name'],
+                'price' => $product['price'],
+                'description' => $product['description'],
+                'image' => $product['image'],
+                'images' => $product['images'],
+                'stock_quantity' => (int)$product['stock_quantity'],
+                'has_sizes' => (bool)$product['has_sizes'],
+                'sizes' => $productSizes,
+                'size_chart_image' => $product['size_chart_image'],
+                'is_active' => (int)$product['is_active'],
+                'click_count' => (int)$product['click_count'],
+                'created_at' => $product['created_at'],
+                'updated_at' => $product['updated_at']
+            ]
         ]);
         
     } catch (PDOException $e) {

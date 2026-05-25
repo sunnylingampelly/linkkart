@@ -290,7 +290,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
         name: _nameController.text.trim(),
         price: double.parse(_priceController.text.trim()),
         description: _descriptionController.text.trim(),
-        stockQuantity: int.parse(_stockController.text.trim()),
+        stockQuantity: _hasSizes ? null : int.parse(_stockController.text.trim()), // Don't send stock when sizes enabled
         image: primaryImage,
         hasSizes: _hasSizes,
         sizes: _hasSizes ? _sizes : null,
@@ -580,11 +580,13 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
                           Expanded(
                             child: _buildTextField(
                               controller: _stockController,
-                              label: 'Stock Qty',
+                              label: _hasSizes ? 'Total Stock' : 'Stock Qty',
                               hint: '50',
                               icon: Icons.inventory_2_rounded,
                               keyboardType: TextInputType.number,
+                              enabled: !_hasSizes, // Disable when sizes are enabled
                               validator: (value) {
+                                if (_hasSizes) return null; // Skip validation when sizes enabled
                                 if (value == null || value.isEmpty) {
                                   return 'Required';
                                 }
@@ -639,7 +641,15 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
                                   value: _hasSizes,
                                   activeColor: AppColors.primary,
                                   onChanged: (value) {
-                                    setState(() => _hasSizes = value);
+                                    setState(() {
+                                      _hasSizes = value;
+                                      if (_hasSizes) {
+                                        // Calculate total from sizes
+                                        int total = 0;
+                                        _sizes.values.forEach((v) => total += v);
+                                        _stockController.text = total.toString();
+                                      }
+                                    });
                                   },
                                 ),
                               ],
@@ -1005,6 +1015,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
     TextInputType? keyboardType,
     int maxLines = 1,
     String? Function(String?)? validator,
+    bool enabled = true,
   }) {    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1023,10 +1034,11 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
           keyboardType: keyboardType,
           maxLines: maxLines,
           validator: validator,
+          enabled: enabled,
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
+            color: enabled ? AppColors.textPrimary : AppColors.textSecondary,
           ),
           decoration: InputDecoration(
             hintText: hint,
@@ -1034,9 +1046,9 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
               color: AppColors.textTertiary.withOpacity(0.5),
               fontSize: 15,
             ),
-            prefixIcon: Icon(icon, color: AppColors.primary, size: 20),
+            prefixIcon: Icon(icon, color: enabled ? AppColors.primary : AppColors.textSecondary, size: 20),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: enabled ? Colors.white : AppColors.border.withOpacity(0.3),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(16)),

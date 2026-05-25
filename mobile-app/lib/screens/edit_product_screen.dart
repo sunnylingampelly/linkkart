@@ -300,7 +300,7 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
         hasSizes: _hasSizes,
         sizes: _hasSizes ? _sizes : null,
         sizeChartImage: _sizeChartImage is File ? _sizeChartImage : null,
-        stockQuantity: int.parse(_stockController.text.trim()),
+        stockQuantity: _hasSizes ? null : int.parse(_stockController.text.trim()), // Don't send stock when sizes enabled
       );
 
       HapticFeedback.mediumImpact();
@@ -506,11 +506,13 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
                           Expanded(
                             child: _buildTextField(
                               controller: _stockController,
-                              label: 'Stock Qty',
+                              label: _hasSizes ? 'Total Stock' : 'Stock Qty',
                               hint: '50',
                               icon: Icons.inventory_2_rounded,
                               keyboardType: TextInputType.number,
+                              enabled: !_hasSizes, // Disable when sizes are enabled
                               validator: (value) {
+                                if (_hasSizes) return null; // Skip validation when sizes enabled
                                 if (value == null || value.isEmpty) {
                                   return 'Required';
                                 }
@@ -565,7 +567,15 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
                                   value: _hasSizes,
                                   activeColor: AppColors.primary,
                                   onChanged: (value) {
-                                    setState(() => _hasSizes = value);
+                                    setState(() {
+                                      _hasSizes = value;
+                                      if (_hasSizes) {
+                                        // Calculate total from sizes
+                                        int total = 0;
+                                        _sizes.values.forEach((v) => total += v);
+                                        _stockController.text = total.toString();
+                                      }
+                                    });
                                   },
                                 ),
                               ],
@@ -963,6 +973,7 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
     TextInputType? keyboardType,
     int maxLines = 1,
     String? Function(String?)? validator,
+    bool enabled = true,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -981,18 +992,19 @@ class _EditProductScreenState extends State<EditProductScreen> with SingleTicker
           keyboardType: keyboardType,
           maxLines: maxLines,
           validator: validator,
+          enabled: enabled,
           style: GoogleFonts.inter(
             fontSize: 16,
-            color: AppColors.textPrimary,
+            color: enabled ? AppColors.textPrimary : AppColors.textSecondary,
           ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.inter(
               color: AppColors.textTertiary,
             ),
-            prefixIcon: Icon(icon, color: AppColors.secondary),
+            prefixIcon: Icon(icon, color: enabled ? AppColors.secondary : AppColors.textSecondary),
             filled: true,
-            fillColor: AppColors.surface,
+            fillColor: enabled ? AppColors.surface : AppColors.border.withOpacity(0.3),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(16)),
 
