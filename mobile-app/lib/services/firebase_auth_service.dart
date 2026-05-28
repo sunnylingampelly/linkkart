@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../utils/constants.dart';
+import 'api_service.dart';
 
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final ApiService _apiService = ApiService();
   String? _verificationId;
   int? _resendToken;
 
@@ -237,11 +239,44 @@ class FirebaseAuthService {
 
       // Once signed in, return the UserCredential
       UserCredential userCredential = await _auth.signInWithCredential(credential);
+      User? user = userCredential.user;
       
-      // Save user data
-      await _saveUser(userCredential.user);
+      if (user != null) {
+        // Synchronize with backend and check for existing store
+        try {
+          final result = await _apiService.googleAuth(
+            email: user.email ?? '',
+            name: user.displayName ?? 'User',
+            phone: user.phoneNumber,
+          );
+          
+          if (result['success'] == true) {
+            final prefs = await SharedPreferences.getInstance();
+            
+            // Save token
+            if (result['data']['token'] != null) {
+              await prefs.setString(AppConstants.authTokenKey, result['data']['token']);
+              AppConstants.authToken = result['data']['token'];
+            }
+            
+            // Save store data if exists
+            if (result['data']['store'] != null) {
+              final storeData = result['data']['store'];
+              await prefs.setInt(AppConstants.storeIdKey, storeData['id']);
+              await prefs.setString(AppConstants.storeDataKey, json.encode(storeData));
+              debugPrint('Existing store found and saved for Google user: ${storeData['name']}');
+            }
+          }
+        } catch (e) {
+          debugPrint('Backend sync error during Google sign in: $e');
+          // We still continue as firebase login was successful
+        }
+        
+        // Save user data locally
+        await _saveUser(user);
+      }
       
-      return userCredential.user;
+      return user;
     } catch (e) {
       debugPrint('Google sign in error: $e');
       return null;

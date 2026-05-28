@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -88,18 +88,34 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
     final user = await _authService.signInWithGoogle();
-    setState(() => _isLoading = false);
-
+    
     if (user != null && mounted) {
-      final hasStore = await _authService.hasStore();
+      final storeProvider = Provider.of<StoreProvider>(context, listen: false);
+      
+      // If store data was already saved in FirebaseAuthService during sign in, 
+      // the StoreProvider will pick it up on the next load. 
+      // But we can manually refresh it here to be safe.
+      final prefs = await SharedPreferences.getInstance();
+      final storeDataStr = prefs.getString(AppConstants.storeDataKey);
+      
+      if (storeDataStr != null && mounted) {
+        final storeData = json.decode(storeDataStr);
+        await storeProvider.setStore(Store.fromJson(storeData));
+      }
+
+      setState(() => _isLoading = false);
+      
       if (!mounted) return;
+      
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (_) => hasStore ? MainScreen() : CreateStoreScreen(),
+          builder: (_) => storeProvider.hasStore ? MainScreen() : CreateStoreScreen(),
         ),
         (route) => false,
       );
+    } else {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

@@ -66,6 +66,25 @@ class ApiService {
   // Common timeout duration
   static const Duration _timeoutDuration = Duration(seconds: 30);
 
+  // Auth APIs
+  Future<Map<String, dynamic>> googleAuth({
+    required String email,
+    required String name,
+    String? phone,
+  }) async {
+    final response = await _safeRequest(() => http.post(
+      Uri.parse('$baseUrl/api/v1/auth/google'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'email': email,
+        'name': name,
+        'phone': phone,
+      }),
+    ));
+
+    return _handleResponse(response);
+  }
+
   // Store APIs
   Future<Store> createStore({
     required String name,

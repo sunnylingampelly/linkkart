@@ -40,6 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Load JWT library
 require_once __DIR__ . '/../lib/JWT.php';
 
+// Str helper for random strings
+class Str {
+    public static function random($length = 16) {
+        $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        return substr(str_shuffle(str_repeat($pool, ceil($length / strlen($pool)))), 0, $length);
+    }
+}
+
 // Database connection - read from environment variables
 $host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost';
 $dbname = $_ENV['DB_DATABASE'] ?? getenv('DB_DATABASE') ?: 'linkkart';
@@ -717,6 +725,82 @@ if ($uri === '/api/v1/auth/logout' && $method === 'POST') {
         'success' => true,
         'message' => 'Logged out successfully'
     ]);
+}
+
+// GOOGLE AUTH (Check if user exists or create new, then return token and store info)
+if ($uri === '/api/v1/auth/google' && $method === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    if (empty($data['email']) || empty($data['name'])) {
+        sendJson(['success' => false, 'message' => 'Email and name are required'], 422);
+    }
+    
+    try {
+        // 1. Check if user exists by email
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND deleted_at IS NULL");
+        $stmt->execute([$data['email']]);
+        $user = $stmt->fetch();
+        
+        if (!$user) {
+            // Create new user if doesn't exist
+            $stmt = $pdo->prepare("
+                INSERT INTO users (name, email, password, phone, role, created_at, updated_at)
+                VALUES (?, ?, ?, ?, 'store_owner', NOW(), NOW())
+            ");
+            $stmt->execute([
+                $data['name'],
+                $data['email'],
+                password_hash(Str::random(16), PASSWORD_BCRYPT), // Random password for google users
+                $data['phone'] ?? null
+            ]);
+            $userId = $pdo->lastInsertId();
+            
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch();
+        } else {
+            $userId = $user['id'];
+        }
+        
+        // 2. Check if user has a store
+        $stmt = $pdo->prepare("
+            SELECT id, name, slug, phone, logo, is_active 
+            FROM stores 
+            WHERE owner_id = ? AND deleted_at IS NULL 
+            LIMIT 1
+        ");
+        $stmt->execute([$userId]);
+        $store = $stmt->fetch();
+        
+        // 3. Generate JWT token
+        $token = JWT::encode([
+            'user_id' => $userId,
+            'email' => $user['email'],
+            'role' => $user['role']
+        ], 86400 * 30); // 30 days for mobile
+        
+        sendJson([
+            'success' => true,
+            'message' => 'Google authentication successful',
+            'data' => [
+                'user' => [
+                    'id' => $userId,
+                    'name' => $user['name'],
+                    'email' => $user['email'],
+                    'phone' => $user['phone'],
+                    'role' => $user['role']
+                ],
+                'store' => $store ?: null,
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'expires_in' => 86400 * 30
+            ]
+        ]);
+        
+    } catch (PDOException $e) {
+        logError('Error google auth', ['error' => $e->getMessage(), 'email' => $data['email']]);
+        sendJson(['success' => false, 'message' => 'Authentication failed: ' . $e->getMessage()], 500);
+    }
 }
 
 // ============================================
@@ -1461,13 +1545,21 @@ if (($uri === '/api/v1/stores' || $uri === '/api/v1/seller/stores') && $method =
             $stmt->execute([$slug]);
         }
         
+        // Get owner_id if authenticated
+        $ownerId = null;
+        $auth = optionalAuth();
+        if ($auth) {
+            $ownerId = $auth['user_id'];
+        }
+
         // Insert store
         $stmt = $pdo->prepare("
-            INSERT INTO stores (name, slug, phone, logo, is_active, created_at, updated_at)
-            VALUES (?, ?, ?, ?, 1, NOW(), NOW())
+            INSERT INTO stores (owner_id, name, slug, phone, logo, is_active, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())
         ");
         
         $stmt->execute([
+            $ownerId,
             $data['name'],
             $slug,
             $data['phone'],

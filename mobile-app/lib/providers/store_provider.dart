@@ -47,6 +47,14 @@ class StoreProvider with ChangeNotifier {
     }
   }
 
+  /// Manually set the store (used after Google login if store is found)
+  Future<void> setStore(Store store) async {
+    _currentStore = store;
+    await _saveStore(store);
+    await loadStatistics();
+    notifyListeners();
+  }
+
   Future<void> _saveStore(Store store) async {
     try {
       final prefs = await SharedPreferences.getInstance();
