@@ -587,6 +587,7 @@ if (preg_match('#^/api/v1/stores/(.+)$#', $uri, $matches)) {
         $stmt = $pdo->prepare("
             SELECT 
                 id, store_id, name, price, description, image, 
+                sizes, has_sizes, size_chart_image,
                 is_active, click_count, created_at, updated_at,
                 CONCAT('₹', FORMAT(price, 2)) as formatted_price
             FROM products 
@@ -596,11 +597,17 @@ if (preg_match('#^/api/v1/stores/(.+)$#', $uri, $matches)) {
         $stmt->execute([$store['id']]);
         $products = $stmt->fetchAll();
         
-        // Add WhatsApp URL to each product
+        // Add WhatsApp URL and parse JSON fields for each product
         foreach ($products as &$product) {
             $message = urlencode("Hi, I want to order {$product['name']} - {$product['formatted_price']}");
             $phone = preg_replace('/[^0-9]/', '', $store['phone']);
             $product['whatsapp_url'] = "https://wa.me/{$phone}?text={$message}";
+            
+            // Parse sizes if present
+            if (!empty($product['sizes'])) {
+                $product['sizes'] = json_decode($product['sizes'], true);
+            }
+            $product['has_sizes'] = (bool)$product['has_sizes'];
         }
         
         // Add computed fields to store
@@ -823,6 +830,15 @@ if ($uri === '/api/v1/seller/products' && $method === 'POST') {
         ");
         $stmt->execute([$productId]);
         $product = $stmt->fetch();
+
+        // Parse JSON fields
+        if ($product) {
+            if (!empty($product['sizes'])) {
+                $product['sizes'] = json_decode($product['sizes'], true);
+            }
+            $product['has_sizes'] = (bool)$product['has_sizes'];
+            $product['is_active'] = (bool)$product['is_active'];
+        }
         
         sendJson([
             'success' => true,

@@ -799,18 +799,41 @@ if (preg_match('#^/api/v1/stores/(\d+)/products$#', $uri, $matches) && $method =
                 image,
                 images,
                 stock_quantity,
+                sizes,
+                has_sizes,
+                size_chart_image,
                 is_active,
                 click_count,
                 created_at,
                 updated_at
             FROM products 
             WHERE store_id = ? 
-                AND is_active = 1 
                 AND deleted_at IS NULL
             ORDER BY created_at DESC
         ");
         $stmt->execute([$storeId]);
         $products = $stmt->fetchAll();
+
+        // Parse JSON fields and types
+        foreach ($products as &$product) {
+            $product['id'] = (int)$product['id'];
+            $product['store_id'] = (int)$product['store_id'];
+            $product['price'] = (float)$product['price'];
+            $product['stock_quantity'] = (int)$product['stock_quantity'];
+            $product['click_count'] = (int)$product['click_count'];
+            $product['is_active'] = (bool)$product['is_active'];
+            $product['has_sizes'] = (bool)$product['has_sizes'];
+
+            if (!empty($product['sizes'])) {
+                $product['sizes'] = json_decode($product['sizes'], true);
+            }
+            if (!empty($product['images'])) {
+                $decoded = json_decode($product['images'], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $product['images'] = $decoded;
+                }
+            }
+        }
         
         sendJson([
             'success' => true,
@@ -1901,7 +1924,7 @@ if ((preg_match('#^/api/v1/products/(\d+)$#', $uri, $matches) && ($method === 'P
 // ============================================
 // DELETE PRODUCT (Soft Delete)
 // ============================================
-if (preg_match('#^/api/v1/products/(\d+)$#', $uri, $matches) && $method === 'DELETE') {
+if ((preg_match('#^/api/v1/products/(\d+)$#', $uri, $matches) || preg_match('#^/api/v1/seller/products/(\d+)$#', $uri, $matches)) && $method === 'DELETE') {
     $productId = $matches[1];
     
     try {
