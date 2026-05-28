@@ -125,10 +125,10 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_active' => 'sometimes|boolean',
-            'has_sizes' => 'nullable|boolean',
-            'sizes' => 'nullable|json',
+            'has_sizes' => 'sometimes|boolean',
+            'sizes' => 'sometimes|json',
             'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'stock_quantity' => 'nullable|integer|min:0',
+            'stock_quantity' => 'sometimes|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -151,6 +151,9 @@ class ProductController extends Controller
             $image = $request->file('image');
             $imagePath = $image->store('products', 'public');
             $data['image'] = Storage::url($imagePath);
+        } else {
+            // Ensure we don't overwrite with null if it's not a file
+            unset($data['image']);
         }
 
         // Handle size chart image upload
@@ -164,11 +167,22 @@ class ProductController extends Controller
             $image = $request->file('size_chart_image');
             $imagePath = $image->store('products/charts', 'public');
             $data['size_chart_image'] = Storage::url($imagePath);
+        } else {
+            // Ensure we don't overwrite with null if it's not a file
+            unset($data['size_chart_image']);
         }
 
         // Decode sizes if it's a string
         if (isset($data['sizes']) && is_string($data['sizes'])) {
-            $data['sizes'] = json_decode($data['sizes'], true);
+            $decodedSizes = json_decode($data['sizes'], true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $data['sizes'] = $decodedSizes;
+                
+                // Explicitly sync stock_quantity if sizes are provided
+                if (is_array($data['sizes'])) {
+                    $data['stock_quantity'] = array_sum($data['sizes']);
+                }
+            }
         }
 
         $product->update($data);
@@ -176,7 +190,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Product updated successfully',
-            'data' => $product->load('store'),
+            'data' => $product->fresh()->load('store'),
         ]);
     }
 

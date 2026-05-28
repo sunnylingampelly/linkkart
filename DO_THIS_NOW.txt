@@ -1,0 +1,57 @@
+==============================================
+COMPLETE FIX - DO THESE STEPS NOW
+==============================================
+
+STEP 1: UPDATE DATABASE (5 minutes)
+------------------------------------
+Run this SQL on production:
+
+mysql -u linkkart -p linkkart < UPDATE_PLANS_SIMPLE.sql
+
+This updates:
+- Free Trial: ₹0, 5 products, ALL features
+- Starter: ₹399, 10 products, ALL features
+- Business: ₹599, UNLIMITED products, ALL features
+
+STEP 2: REBUILD MOBILE APP (10 minutes)
+----------------------------------------
+cd mobile-app
+flutter clean
+flutter pub get
+flutter build apk --release
+
+APK will be at:
+mobile-app/build/app/outputs/flutter-apk/app-release.apk
+
+STEP 3: TEST (15 minutes)
+--------------------------
+1. Install new APK
+2. Add product with sizes (S=10, M=15)
+3. Edit product - verify sizes show correctly
+4. Delete product - verify it's removed
+5. Check pricing screen - verify new plans
+6. Try adding 6th product on Free plan - should show upgrade
+
+WHAT'S FIXED:
+=============
+✅ Product edit - sizes now load correctly (not zeros)
+✅ Plans updated - simplified to product limits only
+✅ All features available to all plans
+✅ Clear upgrade path
+
+NEW PRICING:
+============
+Free Trial:  ₹0    - 5 products
+Starter:     ₹399  - 10 products  
+Business:    ₹599  - Unlimited products
+
+ALL PLANS GET ALL FEATURES!
+Only difference is product limit.
+
+FILES CHANGED:
+==============
+1. UPDATE_PLANS_SIMPLE.sql (database)
+2. lib/screens/edit_product_screen.dart (size fix)
+3. lib/screens/pricing_screen.dart (new plans)
+
+THAT'S IT! Simple and clean.

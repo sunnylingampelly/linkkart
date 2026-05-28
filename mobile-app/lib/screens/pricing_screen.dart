@@ -77,19 +77,21 @@ class _PricingScreenState extends State<PricingScreen> {
     return [
       Plan(
         id: 1,
-        name: 'Free',
+        name: 'Free Trial',
         slug: 'free',
         price: 0,
-        billingCycle: 'monthly',
+        billingCycle: 'lifetime',
         productLimit: 5,
-        orderLimit: 50,
+        orderLimit: 999999,
         features: const [
-          '14 days free trial',
-          '5 products maximum',
-          '50 orders per month',
-          'WhatsApp integration',
-          'Basic store page',
-          'LK Monogram branding',
+          '5 Products',
+          'Unlimited Orders',
+          'WhatsApp Integration',
+          'QR Code Store',
+          'Analytics Dashboard',
+          'Size Variants',
+          'Multiple Images',
+          'Custom Branding',
         ],
         isActive: true,
         sortOrder: 1,
@@ -98,16 +100,20 @@ class _PricingScreenState extends State<PricingScreen> {
         id: 2,
         name: 'Starter',
         slug: 'starter',
-        price: 299,
+        price: 399,
         billingCycle: 'monthly',
-        productLimit: 50,
+        productLimit: 10,
         orderLimit: 999999,
         features: const [
-          '50 products',
-          'Unlimited orders',
-          'Professional LK Branding',
-          'Custom store link',
-          'Email support',
+          '10 Products',
+          'Unlimited Orders',
+          'WhatsApp Integration',
+          'QR Code Store',
+          'Analytics Dashboard',
+          'Size Variants',
+          'Multiple Images',
+          'Custom Branding',
+          'Priority Support',
         ],
         isActive: true,
         sortOrder: 2,
@@ -121,11 +127,16 @@ class _PricingScreenState extends State<PricingScreen> {
         productLimit: 999999,
         orderLimit: 999999,
         features: const [
-          'Unlimited products',
-          'Unlimited orders',
-          'Priority email support',
-          'Store analytics (views, clicks)',
-          'Export data to Excel',
+          'Unlimited Products',
+          'Unlimited Orders',
+          'WhatsApp Integration',
+          'QR Code Store',
+          'Analytics Dashboard',
+          'Size Variants',
+          'Multiple Images',
+          'Custom Branding',
+          'Priority Support',
+          '24/7 Support',
         ],
         isActive: true,
         sortOrder: 3,
@@ -240,20 +251,20 @@ class _PricingScreenState extends State<PricingScreen> {
     } else if (_currentPlan != null) {
       final currentPrice = _currentPlan!['price'] ?? 0.0;
       if (plan.price > currentPrice) {
-        buttonText = 'UPGRADE TO ${plan.name}'.toUpperCase();
+        buttonText = 'UPGRADE NOW';
         buttonColor = AppColors.primary;
         textColor = Colors.white;
       } else if (plan.price < currentPrice) {
-        buttonText = 'DOWNGRADE TO ${plan.name}'.toUpperCase();
+        buttonText = 'SWITCH PLAN';
         buttonColor = Colors.transparent;
         textColor = AppColors.primary;
       } else {
-        buttonText = 'SELECT ${plan.name}'.toUpperCase();
+        buttonText = 'SELECT PLAN';
         buttonColor = AppColors.primary;
         textColor = Colors.white;
       }
     } else {
-      buttonText = isFree ? 'START FREE TRIAL' : 'SELECT ${plan.name}'.toUpperCase();
+      buttonText = isFree ? 'START FREE' : 'SELECT PLAN';
       buttonColor = isFree ? Colors.transparent : AppColors.primary;
       textColor = isFree ? AppColors.primary : Colors.white;
     }

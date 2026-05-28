@@ -21,9 +21,7 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _stockController = TextEditingController();
   
-  bool _hasSizes = false;
   final Map<String, int> _sizes = {
     'S': 0,
     'M': 0,
@@ -59,7 +57,6 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
     _nameController.dispose();
     _priceController.dispose();
     _descriptionController.dispose();
-    _stockController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -290,10 +287,10 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
         name: _nameController.text.trim(),
         price: double.parse(_priceController.text.trim()),
         description: _descriptionController.text.trim(),
-        stockQuantity: _hasSizes ? null : int.parse(_stockController.text.trim()), // Don't send stock when sizes enabled
+        stockQuantity: null, // Always use sizes, backend will calculate
         image: primaryImage,
-        hasSizes: _hasSizes,
-        sizes: _hasSizes ? _sizes : null,
+        hasSizes: true, // Always true now
+        sizes: _sizes,
         sizeChartImage: _sizeChartImage,
       );
 
@@ -555,175 +552,204 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
 
                       SizedBox(height: 16),
 
-                      // Price and Stock Row
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTextField(
-                              controller: _priceController,
-                              label: 'Price (₹)',
-                              hint: '499',
-                              icon: Icons.currency_rupee_rounded,
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required';
-                                }
-                                if (double.tryParse(value) == null) {
-                                  return 'Invalid';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: _buildTextField(
-                              controller: _stockController,
-                              label: _hasSizes ? 'Total Stock' : 'Stock Qty',
-                              hint: '50',
-                              icon: Icons.inventory_2_rounded,
-                              keyboardType: TextInputType.number,
-                              enabled: !_hasSizes, // Disable when sizes are enabled
-                              validator: (value) {
-                                if (_hasSizes) return null; // Skip validation when sizes enabled
-                                if (value == null || value.isEmpty) {
-                                  return 'Required';
-                                }
-                                if (int.tryParse(value) == null) {
-                                  return 'Invalid';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ],
+                      // Price Field (Full Width)
+                      _buildTextField(
+                        controller: _priceController,
+                        label: 'Price (₹)',
+                        hint: '499',
+                        icon: Icons.currency_rupee_rounded,
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Required';
+                          }
+                          if (double.tryParse(value) == null) {
+                            return 'Invalid';
+                          }
+                          return null;
+                        },
                       ),
 
-                      SizedBox(height: 32),
+                      SizedBox(height: 24),
 
-                      // Sizes Section
+                      // Sizes Section - Redesigned
                       Container(
                         padding: EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
+                          gradient: LinearGradient(
+                            colors: [AppColors.primary.withOpacity(0.05), AppColors.surface],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           borderRadius: BorderRadius.all(Radius.circular(16)),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: AppColors.primary.withOpacity(0.2), width: 1.5),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'PRODUCT SIZES',
-                                      style: GoogleFonts.playfairDisplay(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w900,
-                                        color: AppColors.textPrimary,
-                                        letterSpacing: 1.2,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Enable sizes for this product',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
-                                  ],
+                                Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                                  ),
+                                  child: Icon(Icons.straighten_rounded, color: Colors.white, size: 20),
                                 ),
-                                Switch.adaptive(
-                                  value: _hasSizes,
-                                  activeColor: AppColors.primary,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _hasSizes = value;
-                                      if (_hasSizes) {
-                                        // Calculate total from sizes
-                                        int total = 0;
-                                        _sizes.values.forEach((v) => total += v);
-                                        _stockController.text = total.toString();
-                                      }
-                                    });
-                                  },
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'PRODUCT SIZES',
+                                        style: GoogleFonts.playfairDisplay(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w900,
+                                          color: AppColors.textPrimary,
+                                          letterSpacing: 1.2,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Set quantity for each size',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                            if (_hasSizes) ...[
-                              SizedBox(height: 24),
-                              Text(
-                                'Available Sizes & Quantities',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              SizedBox(height: 16),
-                              Wrap(
-                                spacing: 12,
-                                runSpacing: 16,
+                            SizedBox(height: 20),
+                            
+                            // Sizes in horizontal scroll
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
                                 children: _sizes.keys.map((size) {
                                   return Container(
-                                    width: (MediaQuery.of(context).size.width - 88) / 3,
+                                    margin: EdgeInsets.only(right: 12),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           size,
                                           style: GoogleFonts.inter(
-                                            fontSize: 12,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.bold,
-                                            color: AppColors.textSecondary,
+                                            color: AppColors.textPrimary,
+                                            letterSpacing: 0.5,
                                           ),
                                         ),
                                         SizedBox(height: 8),
-                                        TextFormField(
-                                          initialValue: _sizes[size].toString(),
-                                          keyboardType: TextInputType.number,
-                                          decoration: InputDecoration(
-                                            hintText: '0',
-                                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                            filled: true,
-                                            fillColor: AppColors.background,
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(Radius.circular(8)),
-                                              borderSide: BorderSide(color: AppColors.border),
+                                        Container(
+                                          width: 70,
+                                          child: TextFormField(
+                                            initialValue: _sizes[size].toString(),
+                                            keyboardType: TextInputType.number,
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.inter(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.textPrimary,
                                             ),
+                                            decoration: InputDecoration(
+                                              hintText: '0',
+                                              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                                              filled: true,
+                                              fillColor: Colors.white,
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                                                borderSide: BorderSide(color: AppColors.border, width: 1.5),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                                                borderSide: BorderSide(color: AppColors.border, width: 1.5),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                                                borderSide: BorderSide(color: AppColors.primary, width: 2),
+                                              ),
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _sizes[size] = int.tryParse(value) ?? 0;
+                                              });
+                                            },
                                           ),
-                                          onChanged: (value) {
-                                            _sizes[size] = int.tryParse(value) ?? 0;
-                                            // Update total stock
-                                            int total = 0;
-                                            _sizes.values.forEach((v) => total += v);
-                                            _stockController.text = total.toString();
-                                          },
                                         ),
                                       ],
                                     ),
                                   );
                                 }).toList(),
                               ),
-                              SizedBox(height: 24),
-                              Divider(color: AppColors.border),
-                              SizedBox(height: 16),
-                              Text(
-                                'Size Chart',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
-                                ),
+                            ),
+                            
+                            SizedBox(height: 20),
+                            
+                            // Total Quantity Display
+                            Container(
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                                border: Border.all(color: AppColors.primary.withOpacity(0.3)),
                               ),
-                              SizedBox(height: 12),
-                              GestureDetector(
-                                onTap: () => _pickSizeChartImage(),
-                                child: Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.inventory_2_rounded, color: AppColors.primary, size: 20),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Total Quantity',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary,
+                                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                                    ),
+                                    child: Text(
+                                      '${_sizes.values.fold(0, (sum, qty) => sum + qty)}',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            SizedBox(height: 20),
+                            Divider(color: AppColors.border),
+                            SizedBox(height: 16),
+                            
+                            // Size Chart Upload
+                            Text(
+                              'Size Chart (Optional)',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            GestureDetector(
+                              onTap: () => _pickSizeChartImage(),
+                              child: Container(
                                   height: 120,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
@@ -765,7 +791,6 @@ class _AddProductScreenPremiumState extends State<AddProductScreenPremium> with 
                                         ),
                                 ),
                               ),
-                            ],
                           ],
                         ),
                       ),
