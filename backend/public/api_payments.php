@@ -334,7 +334,7 @@ if ($uri === '/api/v1/payments/create-order' && $method === 'POST') {
             logError('Error creating payment order', ['error' => $e->getMessage(), 'data' => $data]);
             sendJson([
                 'success' => false,
-                'message' => 'Unable to create payment order. Please try again.',
+                'message' => 'Unable to create payment order: ' . $e->getMessage(),
                 'error_code' => 'PAYMENT_ERROR'
             ], 500);
         }
@@ -514,7 +514,7 @@ if ($uri === '/api/v1/payments/verify' && $method === 'POST') {
         logError('Error verifying payment', ['error' => $e->getMessage(), 'data' => $data]);
         sendJson([
             'success' => false,
-            'message' => 'Unable to verify payment. Please try again.',
+            'message' => 'Unable to verify payment: ' . $e->getMessage(),
             'error_code' => 'VERIFICATION_ERROR'
         ], 500);
     }

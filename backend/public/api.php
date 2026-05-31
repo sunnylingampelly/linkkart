@@ -404,7 +404,7 @@ function sendJson($data, $code = 200) {
 }
 
 function logError($message, $context = []) {
-    $logFile = __DIR__ . '/storage/logs/api.log';
+    $logFile = __DIR__ . '/../storage/logs/api.log';
     $timestamp = date('Y-m-d H:i:s');
     $contextStr = json_encode($context);
     $logMessage = "[$timestamp] $message | Context: $contextStr\n";
