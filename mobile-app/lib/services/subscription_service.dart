@@ -61,6 +61,60 @@ class SubscriptionService {
     }
   }
 
+  Future<Map<String, dynamic>> syncSubscription(int storeId, {bool force = false}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Prevent frequent database sync calls unless forced (cache for 1 minute)
+      if (!force) {
+        final lastUpdateStr = prefs.getString(AppConstants.subscriptionUpdatedAtKey);
+        if (lastUpdateStr != null && lastUpdateStr.isNotEmpty) {
+          final lastUpdate = DateTime.tryParse(lastUpdateStr);
+          if (lastUpdate != null && DateTime.now().difference(lastUpdate).inMinutes < 1) {
+            return getCurrentPlan();
+          }
+        }
+      }
+      
+      final response = await _apiService.getStoreSubscription(storeId);
+      if (response['success'] == true) {
+        final subData = response['data'];
+        final plans = await _apiService.getPlans();
+        
+        final planId = int.tryParse(subData['plan_id'].toString()) ?? 1;
+        final plan = plans.firstWhere(
+          (p) => p.id == planId,
+          orElse: () => Plan(
+            id: planId,
+            name: subData['plan_name'] ?? 'Basic',
+            slug: subData['plan_slug'] ?? 'free',
+            price: double.tryParse(subData['price'].toString()) ?? 0.0,
+            billingCycle: 'monthly',
+            productLimit: 100,
+            orderLimit: 100,
+            features: [],
+            isActive: true,
+            sortOrder: 1,
+          ),
+        );
+
+        await prefs.setInt(AppConstants.subscriptionStoreIdKey, storeId);
+        await prefs.setString(AppConstants.subscriptionPlanNameKey, plan.name);
+        await prefs.setString(AppConstants.subscriptionPlanSlugKey, plan.slug);
+        await prefs.setDouble(AppConstants.subscriptionPlanPriceKey, plan.price);
+        await prefs.setString(AppConstants.subscriptionStatusKey, subData['status'] ?? 'trial');
+        await prefs.setString(
+          AppConstants.subscriptionUpdatedAtKey,
+          DateTime.now().toIso8601String(),
+        );
+      }
+      return getCurrentPlan();
+    } catch (e) {
+      print('Error syncing subscription: $e');
+      return getCurrentPlan();
+    }
+  }
+
   Future<Map<String, dynamic>> getCurrentPlan() async {
     final prefs = await SharedPreferences.getInstance();
     return {

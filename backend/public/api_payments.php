@@ -211,6 +211,50 @@ if (preg_match('#^/api/v1/subscriptions/(\d+)$#', $uri, $matches) && $method ===
 }
 
 // ============================================
+// GET SUBSCRIPTION BY STORE ID
+// ============================================
+if (preg_match('#^/api/v1/stores/(\d+)/subscription$#', $uri, $matches) && $method === 'GET') {
+    $auth = optionalAuth();
+    $storeId = $matches[1];
+    
+    try {
+        $stmt = $pdo->prepare("
+            SELECT s.*, p.name as plan_name, p.slug as plan_slug, p.price, p.features
+            FROM subscriptions s
+            JOIN plans p ON s.plan_id = p.id
+            WHERE s.store_id = ?
+            ORDER BY s.id DESC LIMIT 1
+        ");
+        $stmt->execute([$storeId]);
+        $subscription = $stmt->fetch();
+        
+        if (!$subscription) {
+            sendJson([
+                'success' => false,
+                'message' => 'No subscription found for this store',
+                'error_code' => 'SUBSCRIPTION_NOT_FOUND'
+            ], 404);
+        }
+        
+        $subscription['features'] = json_decode($subscription['features'], true);
+        $subscription['price'] = (float)$subscription['price'];
+        
+        sendJson([
+            'success' => true,
+            'data' => $subscription
+        ]);
+        
+    } catch (PDOException $e) {
+        logError('Error fetching store subscription', ['error' => $e->getMessage()]);
+        sendJson([
+            'success' => false,
+            'message' => 'Unable to fetch subscription. Please try again.',
+            'error_code' => 'DATABASE_ERROR'
+        ], 500);
+    }
+}
+
+// ============================================
 // CREATE PAYMENT ORDER (Razorpay)
 // ============================================
 // ============================================
@@ -519,6 +563,208 @@ if ($uri === '/api/v1/payments/verify' && $method === 'POST') {
         ], 500);
     }
 }
+
+// ============================================
+// GOOGLE PLAY BILLING SECURE HANDSHAKE HELPERS
+// ============================================
+function getGoogleAccessToken($keyFile) {
+    if (!file_exists($keyFile)) {
+        throw new Exception("Google key file not found");
+    }
+    
+    $keyData = json_decode(file_get_contents($keyFile), true);
+    if (!$keyData) {
+        throw new Exception("Invalid Google key file format");
+    }
+
+    $privateKey = $keyData['private_key'];
+    $clientEmail = $keyData['client_email'];
+
+    $header = json_encode(['alg' => 'RS256', 'typ' => 'JWT']);
+    $now = time();
+    $payload = json_encode([
+        'iss' => $clientEmail,
+        'scope' => 'https://www.googleapis.com/auth/androidpublisher',
+        'aud' => 'https://oauth2.googleapis.com/token',
+        'exp' => $now + 3600,
+        'iat' => $now
+    ]);
+
+    $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
+    $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
+
+    $signatureInput = $base64UrlHeader . "." . $base64UrlPayload;
+    $signature = '';
+    openssl_sign($signatureInput, $signature, $privateKey, 'SHA256');
+    $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
+
+    $jwt = $signatureInput . "." . $base64UrlSignature;
+
+    $ch = curl_init('https://oauth2.googleapis.com/token');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+        'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        'assertion' => $jwt
+    ]));
+
+    $response = curl_exec($ch);
+    $error = curl_error($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($error) {
+        throw new Exception("OAuth request failed: " . $error);
+    }
+
+    $tokenData = json_decode($response, true);
+    if ($httpCode !== 200 || !isset($tokenData['access_token'])) {
+        throw new Exception("OAuth error: " . ($tokenData['error_description'] ?? 'Unknown error'));
+    }
+
+    return $tokenData['access_token'];
+}
+
+function getGoogleSubscriptionStatus($packageName, $productId, $purchaseToken, $accessToken) {
+    $url = "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/" . urlencode($packageName) . "/purchases/subscriptions/" . urlencode($productId) . "/tokens/" . urlencode($purchaseToken);
+    
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $accessToken",
+        "Content-Type: application/json"
+    ]);
+
+    $response = curl_exec($ch);
+    $error = curl_error($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($error) {
+        throw new Exception("Google Play API Request failed: " . $error);
+    }
+
+    $data = json_decode($response, true);
+    if ($httpCode !== 200) {
+        throw new Exception("Google Play API Error: " . ($data['error']['message'] ?? 'Unknown error'));
+    }
+
+    return $data;
+}
+
+// ============================================
+// VERIFY GOOGLE PLAY BILLING PURCHASE
+// ============================================
+if ($uri === '/api/v1/payments/verify-google-play' && $method === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    $storeId = $data['store_id'] ?? null;
+    $productId = $data['product_id'] ?? null;
+    $purchaseToken = $data['purchase_token'] ?? null;
+
+    if (!$storeId || !$productId || !$purchaseToken) {
+        sendJson([
+            'success' => false,
+            'message' => 'Missing store_id, product_id, or purchase_token'
+        ], 422);
+    }
+
+    try {
+        $keyFile = __DIR__ . '/../google-services-key.json';
+        
+        // If credentials file is missing, do a sandbox mock for testing
+        if (!file_exists($keyFile)) {
+            // Mock successful validation for development sandbox testing
+            $expiryTime = date('Y-m-d H:i:s', strtotime('+1 month'));
+            
+            // Get Plan ID from DB using productId mapping (e.g. linkkart_gold_monthly -> slug: gold)
+            $slug = str_replace('linkkart_', '', $productId);
+            $stmt = $pdo->prepare("SELECT id FROM plans WHERE slug = ?");
+            $stmt->execute([$slug]);
+            $plan = $stmt->fetch();
+            $planId = $plan ? $plan['id'] : 2; // default to gold if plan not found
+
+            // Insert subscription
+            $stmt = $pdo->prepare("
+                INSERT INTO subscriptions (store_id, plan_id, status, starts_at, ends_at, created_at, updated_at)
+                VALUES (?, ?, 'active', NOW(), ?, NOW(), NOW())
+            ");
+            $stmt->execute([$storeId, $planId, $expiryTime]);
+            $subscriptionId = $pdo->lastInsertId();
+            
+            // Update store with subscription_id
+            $stmt = $pdo->prepare("UPDATE stores SET subscription_id = ? WHERE id = ?");
+            $stmt->execute([$subscriptionId, $storeId]);
+
+            sendJson([
+                'success' => true,
+                'message' => 'Mock Google Play subscription verified (Sandbox Mode)',
+                'data' => [
+                    'subscription_id' => $subscriptionId,
+                    'status' => 'active',
+                    'ends_at' => $expiryTime
+                ]
+            ]);
+        }
+
+        $accessToken = getGoogleAccessToken($keyFile);
+        $packageName = 'com.vashynova.linkkart';
+        
+        $subResponse = getGoogleSubscriptionStatus($packageName, $productId, $purchaseToken, $accessToken);
+        
+        $expiryTimeMillis = $subResponse['expiryTimeMillis'] ?? 0;
+        $expiryDate = date('Y-m-d H:i:s', $expiryTimeMillis / 1000);
+
+        if (time() < ($expiryTimeMillis / 1000)) {
+            $slug = str_replace('linkkart_', '', $productId);
+            $stmt = $pdo->prepare("SELECT id FROM plans WHERE slug = ?");
+            $stmt->execute([$slug]);
+            $plan = $stmt->fetch();
+            
+            if (!$plan) {
+                throw new Exception("Plan slug '$slug' not found in database.");
+            }
+
+            // Insert subscription
+            $stmt = $pdo->prepare("
+                INSERT INTO subscriptions (store_id, plan_id, status, starts_at, ends_at, created_at, updated_at)
+                VALUES (?, ?, 'active', NOW(), ?, NOW(), NOW())
+            ");
+            $stmt->execute([$storeId, $plan['id'], $expiryDate]);
+            $subscriptionId = $pdo->lastInsertId();
+            
+            // Update store with subscription_id
+            $stmt = $pdo->prepare("UPDATE stores SET subscription_id = ? WHERE id = ?");
+            $stmt->execute([$subscriptionId, $storeId]);
+
+            sendJson([
+                'success' => true,
+                'message' => 'Google Play subscription verified successfully',
+                'data' => [
+                    'subscription_id' => $subscriptionId,
+                    'status' => 'active',
+                    'ends_at' => $expiryDate
+                ]
+            ]);
+        } else {
+            sendJson([
+                'success' => false,
+                'message' => 'Google Play subscription has expired'
+            ], 400);
+        }
+
+    } catch (Exception $e) {
+        logError('Google Play Verification Error', ['error' => $e->getMessage()]);
+        sendJson([
+            'success' => false,
+            'message' => 'Google Play verification failed: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+// ============================================
 
 // ============================================
 // GET PAYMENT HISTORY

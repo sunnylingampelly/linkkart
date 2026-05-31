@@ -448,6 +448,33 @@ class ApiService {
     return data['data'];
   }
 
+  Future<Map<String, dynamic>> verifyGooglePlayPurchase({
+    required int storeId,
+    required String productId,
+    required String purchaseToken,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/v1/payments/verify-google-play'),
+      headers: await _authHeaders(),
+      body: json.encode({
+        'store_id': storeId,
+        'product_id': productId,
+        'purchase_token': purchaseToken,
+      }),
+    );
+
+    return _handleResponse(response);
+  }
+
+  Future<Map<String, dynamic>> getStoreSubscription(int storeId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/v1/stores/$storeId/subscription'),
+      headers: await _authHeaders(),
+    );
+
+    return _handleResponse(response);
+  }
+
   Future<List<dynamic>> getPaymentHistory() async {
     final response = await http.get(
       Uri.parse('$baseUrl/api/v1/payments/history'),

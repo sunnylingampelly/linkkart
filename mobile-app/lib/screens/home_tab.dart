@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +39,11 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   Future<void> _loadPlanData() async {
-    final planData = await SubscriptionService().getCurrentPlan();
+    final storeProvider = Provider.of<StoreProvider>(context, listen: false);
+    final store = storeProvider.currentStore;
+    final planData = store != null
+        ? await SubscriptionService().syncSubscription(store.id)
+        : await SubscriptionService().getCurrentPlan();
     if (!mounted) return;
     setState(() {
       _planName = planData['name'] as String? ?? 'Basic';
@@ -507,11 +511,12 @@ class _HomeTabState extends State<HomeTab> {
           ),
           if (storeId != null)
             TextButton(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => PricingScreen(storeId: storeId)),
                 );
+                _loadPlanData();
               },
               style: TextButton.styleFrom(
                 backgroundColor: Color(0xFFD4AF37),

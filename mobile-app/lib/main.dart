@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/splash_screen.dart';
 import 'providers/store_provider.dart';
 import 'providers/product_provider.dart';
+import 'services/iap_service.dart';
 import 'utils/app_theme.dart';
 import 'utils/constants.dart';
 
@@ -63,6 +64,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => StoreProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => IapService()..initialize()),
       ],
       child: MaterialApp(
         title: 'LinkKart',

@@ -1,10 +1,14 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../services/subscription_service.dart';
+import '../services/iap_service.dart';
 import '../models/plan.dart';
 import '../utils/app_colors.dart';
+import '../utils/constants.dart';
 
 class PaymentScreen extends StatefulWidget {
   final int storeId;
@@ -25,6 +29,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   late Razorpay _razorpay;
   bool _processing = false;
   int? _subscriptionId;
+  String _selectedMethod = 'google_play'; // Default to Google Play to follow app store policy
 
   @override
   void initState() {
@@ -33,11 +38,53 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final iapService = Provider.of<IapService>(context, listen: false);
+        iapService.addListener(_onIapChanged);
+        
+        final productId = 'linkkart_${widget.plan.slug}_monthly';
+        iapService.loadProducts([productId]);
+      } catch (e) {
+        debugPrint('Error initializing Google Play Billing: $e');
+      }
+    });
+  }
+
+  void _onIapChanged() async {
+    if (!mounted) return;
+    final iapService = Provider.of<IapService>(context, listen: false);
+    
+    if (iapService.error != null) {
+      setState(() => _processing = false);
+      _showError(iapService.error!);
+      iapService.clearError();
+    }
+    
+    // Check if the plan is now active locally
+    final currentPlan = await SubscriptionService().getCurrentPlan();
+    if (currentPlan['slug'] == widget.plan.slug && currentPlan['status'] == 'active') {
+      if (mounted) {
+        setState(() => _processing = false);
+        Navigator.pop(context, true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Subscription activated successfully via Google Play!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    }
   }
 
   @override
   void dispose() {
     _razorpay.clear();
+    try {
+      final iapService = Provider.of<IapService>(context, listen: false);
+      iapService.removeListener(_onIapChanged);
+    } catch (_) {}
     super.dispose();
   }
 
@@ -226,6 +273,120 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             const SizedBox(height: 32),
 
+            // Payment Method Section
+            Text(
+              'PAYMENT METHOD',
+              style: GoogleFonts.inter(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Google Play Option
+            GestureDetector(
+              onTap: () => setState(() => _selectedMethod = 'google_play'),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                  border: Border.all(
+                    color: _selectedMethod == 'google_play' ? AppColors.secondary : AppColors.border,
+                    width: _selectedMethod == 'google_play' ? 2 : 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _selectedMethod == 'google_play' ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
+                      color: _selectedMethod == 'google_play' ? AppColors.secondary : AppColors.textTertiary,
+                    ),
+                    const SizedBox(width: 16),
+                    const Icon(Icons.play_arrow_rounded, color: AppColors.primary, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Google Play Billing',
+                            style: GoogleFonts.inter(
+                              color: AppColors.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'One-tap secure purchase via Google Account',
+                            style: GoogleFonts.inter(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Razorpay Option
+            GestureDetector(
+              onTap: () => setState(() => _selectedMethod = 'razorpay'),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                  border: Border.all(
+                    color: _selectedMethod == 'razorpay' ? AppColors.secondary : AppColors.border,
+                    width: _selectedMethod == 'razorpay' ? 2 : 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _selectedMethod == 'razorpay' ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
+                      color: _selectedMethod == 'razorpay' ? AppColors.secondary : AppColors.textTertiary,
+                    ),
+                    const SizedBox(width: 16),
+                    const Icon(Icons.payment_rounded, color: AppColors.primary, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Razorpay',
+                            style: GoogleFonts.inter(
+                              color: AppColors.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'UPI, Cards, Netbanking & Wallets',
+                            style: GoogleFonts.inter(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+
             // Trial Info
             Container(
               padding: const EdgeInsets.all(24),
@@ -334,6 +495,41 @@ class _PaymentScreenState extends State<PaymentScreen> {
       return;
     }
 
+    if (_selectedMethod == 'google_play') {
+      await _startGooglePlayPayment();
+    } else {
+      await _startRazorpayPayment();
+    }
+  }
+
+  Future<void> _startGooglePlayPayment() async {
+    setState(() => _processing = true);
+    try {
+      final iapService = Provider.of<IapService>(context, listen: false);
+      if (!iapService.isAvailable) {
+        throw Exception('Google Play Billing is not available on this device');
+      }
+
+      final productId = 'linkkart_${widget.plan.slug}_monthly';
+      
+      // Look for Google Play product
+      final product = iapService.products.firstWhere(
+        (p) => p.id == productId,
+        orElse: () => throw Exception('Product details for ${widget.plan.name} plan could not be loaded from Google Play Store.'),
+      );
+
+      // Save the store ID locally before purchase so the verification callback has access to it
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(AppConstants.subscriptionStoreIdKey, widget.storeId);
+
+      await iapService.buySubscription(product);
+    } catch (e) {
+      setState(() => _processing = false);
+      _showError(e.toString());
+    }
+  }
+
+  Future<void> _startRazorpayPayment() async {
     try {
       setState(() => _processing = true);
 
