@@ -232,6 +232,28 @@ if (!is_dir($storageDir) || !is_writable($storageDir)) {
 }
 echo "</div>";
 
+// Razorpay Configuration Check
+echo "<div class='section'>";
+echo "<h2>5. Razorpay Configuration Check</h2>";
+$razorpayKeyId = getenv('RAZORPAY_KEY_ID') ?: ($_ENV['RAZORPAY_KEY_ID'] ?? 'NOT SET');
+$razorpayKeySecret = getenv('RAZORPAY_KEY_SECRET') ?: ($_ENV['RAZORPAY_KEY_SECRET'] ?? 'NOT SET');
+
+$isIdPlaceholder = in_array($razorpayKeyId, ['your_razorpay_key_here', 'your_razorpay_key', 'rzp_test_YOUR_KEY_ID', 'NOT SET']);
+$isSecretPlaceholder = in_array($razorpayKeySecret, ['your_razorpay_secret_here', 'YOUR_KEY_SECRET', 'NOT SET']);
+
+echo "<table>";
+echo "<tr><th>Setting</th><th>Value</th><th>Status</th></tr>";
+echo "<tr><td><strong>RAZORPAY_KEY_ID</strong></td><td><code>" . htmlspecialchars(substr($razorpayKeyId, 0, 8)) . "... (length: " . strlen($razorpayKeyId) . ")</code></td><td>" . (!$isIdPlaceholder ? '✅ Loaded' : '❌ Missing or Placeholder') . "</td></tr>";
+echo "<tr><td><strong>RAZORPAY_KEY_SECRET</strong></td><td><code>" . htmlspecialchars(substr($razorpayKeySecret, 0, 4)) . "... (length: " . strlen($razorpayKeySecret) . ")</code></td><td>" . (!$isSecretPlaceholder ? '✅ Loaded' : '❌ Missing or Placeholder') . "</td></tr>";
+echo "</table>";
+
+if ($isIdPlaceholder || $isSecretPlaceholder) {
+    echo "<div class='status error'>❌ Razorpay Credentials are missing or using placeholder values!</div>";
+} else {
+    echo "<div class='status success'>✅ Razorpay credentials loaded successfully from environment.</div>";
+}
+echo "</div>";
+
 // Recommendations
 echo "<div class='section'>";
 echo "<h2>5. Recommendations</h2>";

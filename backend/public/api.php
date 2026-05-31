@@ -169,6 +169,21 @@ if ($uri === '/api/check-db' || $uri === '/check_db_config.php' || $uri === '/ch
         $diagnostics['overall_status'] = 'ERROR';
     }
     
+    // Add Razorpay diagnostics safely
+    $razorpayKeyId = getenv('RAZORPAY_KEY_ID') ?: ($_ENV['RAZORPAY_KEY_ID'] ?? 'NOT SET');
+    $razorpayKeySecret = getenv('RAZORPAY_KEY_SECRET') ?: ($_ENV['RAZORPAY_KEY_SECRET'] ?? 'NOT SET');
+
+    $isIdPlaceholder = in_array($razorpayKeyId, ['your_razorpay_key_here', 'your_razorpay_key', 'rzp_test_YOUR_KEY_ID', 'NOT SET']);
+    $isSecretPlaceholder = in_array($razorpayKeySecret, ['your_razorpay_secret_here', 'YOUR_KEY_SECRET', 'NOT SET']);
+
+    $diagnostics['razorpay_config'] = [
+        'key_id_length' => strlen($razorpayKeyId),
+        'key_id_prefix' => substr($razorpayKeyId, 0, 8),
+        'key_secret_length' => strlen($razorpayKeySecret),
+        'key_secret_prefix' => substr($razorpayKeySecret, 0, 4),
+        'status' => (!$isIdPlaceholder && !$isSecretPlaceholder) ? 'LOADED' : 'MISSING_OR_PLACEHOLDER'
+    ];
+    
     sendJson($diagnostics);
 }
 
