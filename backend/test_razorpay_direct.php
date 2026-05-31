@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/lib/Razorpay.php';
-$keyId = 'rzp_test_SnZobCxSkQHK8T';
-$keySecret = 'cBSLn082YWFL57LvUG5JFETM';
+$keyId = 'rzp_test_Svsf9HTBN2tSr7';
+$keySecret = 'N0UO2JPzkVYyqmbze6br9QiS';
 
 $razorpay = new Razorpay($keyId, $keySecret);
 try {

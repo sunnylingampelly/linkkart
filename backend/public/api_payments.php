@@ -5,8 +5,8 @@
  */
 
 // Razorpay Configuration
-$razorpayKeyId = getenv('RAZORPAY_KEY_ID') ?: 'rzp_test_YOUR_KEY_ID';
-$razorpayKeySecret = getenv('RAZORPAY_KEY_SECRET') ?: 'YOUR_KEY_SECRET';
+$razorpayKeyId = getenv('RAZORPAY_KEY_ID') ?: 'rzp_test_Svsf9HTBN2tSr7';
+$razorpayKeySecret = getenv('RAZORPAY_KEY_SECRET') ?: 'N0UO2JPzkVYyqmbze6br9QiS';
 $taxRate = 0.00; // GST removed as per user request
 $webhookSecret = getenv('WEBHOOK_SECRET') ?: 'YOUR_WEBHOOK_SECRET';
 
