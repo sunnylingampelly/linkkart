@@ -390,7 +390,7 @@ class ApiService {
     int planId,
   ) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/api/v1/seller/subscriptions'),
+      Uri.parse('$baseUrl/api/v1/subscriptions'),
       headers: await _authHeaders(),
       body: json.encode({
         'store_id': storeId,
@@ -404,7 +404,7 @@ class ApiService {
 
   Future<Map<String, dynamic>> getSubscription(int subscriptionId) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/api/v1/seller/subscriptions/$subscriptionId'),
+      Uri.parse('$baseUrl/api/v1/subscriptions/$subscriptionId'),
       headers: await _authHeaders(),
     );
 
@@ -417,7 +417,7 @@ class ApiService {
     double amount,
   ) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/api/v1/seller/payments/create-order'),
+      Uri.parse('$baseUrl/api/v1/payments/create-order'),
       headers: await _authHeaders(),
       body: json.encode({
         'subscription_id': subscriptionId,
@@ -435,7 +435,7 @@ class ApiService {
     String signature,
   ) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/api/v1/seller/payments/verify'),
+      Uri.parse('$baseUrl/api/v1/payments/verify'),
       headers: await _authHeaders(),
       body: json.encode({
         'razorpay_order_id': orderId,
@@ -450,7 +450,7 @@ class ApiService {
 
   Future<List<dynamic>> getPaymentHistory() async {
     final response = await http.get(
-      Uri.parse('$baseUrl/payments/history'),
+      Uri.parse('$baseUrl/api/v1/payments/history'),
       headers: await _authHeaders(),
     );
 

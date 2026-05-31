@@ -43,9 +43,9 @@ class SubscriptionService {
     String status = 'active',
   }) async {
     try {
-      // Create subscription on backend
-      await _apiService.createSubscription(storeId, plan.id);
-
+      // NOTE: Do NOT call createSubscription here — the subscription was already
+      // created before Razorpay was opened. This method only persists the
+      // activated plan locally so the UI reflects the new status immediately.
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(AppConstants.subscriptionStoreIdKey, storeId);
       await prefs.setString(AppConstants.subscriptionPlanNameKey, plan.name);
@@ -57,7 +57,7 @@ class SubscriptionService {
         DateTime.now().toIso8601String(),
       );
     } catch (e) {
-      print('Error activating plan: $e');
+      print('Error activating plan locally: $e');
     }
   }
 

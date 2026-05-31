@@ -376,6 +376,23 @@ if ($uri === '/api/products' || $uri === '/products') {
     $uri = '/api/v1/products';
 }
 
+// Seller-prefixed aliases (kept for backward compatibility)
+if ($uri === '/api/v1/seller/subscriptions' || $uri === '/api/v1/seller/subscriptions/') {
+    $uri = '/api/v1/subscriptions';
+}
+if (preg_match('#^/api/v1/seller/subscriptions/(\d+)$#', $uri, $m)) {
+    $uri = '/api/v1/subscriptions/' . $m[1];
+}
+if ($uri === '/api/v1/seller/payments/create-order') {
+    $uri = '/api/v1/payments/create-order';
+}
+if ($uri === '/api/v1/seller/payments/verify') {
+    $uri = '/api/v1/payments/verify';
+}
+if ($uri === '/api/v1/seller/payments/history') {
+    $uri = '/api/v1/payments/history';
+}
+
 // Load payment endpoints (after $uri and $method are defined)
 require_once __DIR__ . '/api_payments.php';
 
